@@ -11,7 +11,7 @@ import com.parse.ParseObject;
 import sns.meme.ual.R;
 
 
-public class MainActivity extends ActionBarActivity {
+public class BoardActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
