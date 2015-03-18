@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/refresh_button_pressed" android:state_pressed="true"/> <!-- pressed -->
+    <item android:drawable="@drawable/refresh_button" android:state_enabled="true"/> <!-- up -->
+    <item android:drawable="@drawable/refresh_button" android:state_enabled="false"/> <!-- disabled -->
+</selector>

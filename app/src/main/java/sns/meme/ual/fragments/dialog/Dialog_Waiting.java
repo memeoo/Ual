@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
-import com.hellocafe.android.R;
+import sns.meme.ual.R;
 
 /**
  * Created by jungyongjoo on 14. 11. 25..

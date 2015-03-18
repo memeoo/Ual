@@ -8,9 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import sns.meme.ual.base.Constants;
+import sns.meme.ual.R;
 
-import com.hellocafe.android.R;
-import com.hellocafe.android.base.Constants;
 
 public class Dialog_RequestUnavailable extends DialogFragment {
     private static String mReason;

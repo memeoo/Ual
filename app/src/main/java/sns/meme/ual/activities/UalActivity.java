@@ -1,16 +1,33 @@
 package sns.meme.ual.activities;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 
+import sns.meme.ual.base.Constants;
 import sns.meme.ual.base.UalApplication;
 import sns.meme.ual.base.UalDao;
+import sns.meme.ual.fragments.dialog.Dialog_Apologizes;
+import sns.meme.ual.fragments.dialog.Dialog_BecomeTeacher;
+import sns.meme.ual.fragments.dialog.Dialog_CancelMeeting;
+import sns.meme.ual.fragments.dialog.Dialog_ErrorGeneric;
+import sns.meme.ual.fragments.dialog.Dialog_LocationEnable;
+import sns.meme.ual.fragments.dialog.Dialog_MoneyEarned;
+import sns.meme.ual.fragments.dialog.Dialog_NetWorkError;
+import sns.meme.ual.fragments.dialog.Dialog_NetworkEnable;
+import sns.meme.ual.fragments.dialog.Dialog_NoCoach;
+import sns.meme.ual.fragments.dialog.Dialog_Recharge;
+import sns.meme.ual.fragments.dialog.Dialog_RequestUnavailable;
+import sns.meme.ual.fragments.dialog.Dialog_TooEarly;
+import sns.meme.ual.fragments.dialog.Dialog_Waiting;
 
 /**
  * Created by Meme on 2015-03-17.
@@ -58,6 +75,82 @@ public class UalActivity extends ActionBarActivity {
         bundle.putString(Constants.INTENT_EXTRA_ERROR_DIALOG_TITLE, title);
         bundle.putString(Constants.INTENT_EXTRA_ERROR_DIALOG_MESSAGE, text);
         onShowDialogs(Constants.DIA_ERROR_GENERIC, bundle);
+    }
+
+    public void onShowDialogs(int type, Bundle bundle) {
+        if (isFinishing())
+            return;
+        DialogFragment dialogFragment = null;
+        switch (type) {
+            case Constants.DIA_WAITING:
+                dialogFragment = new Dialog_Waiting();
+                dialogFragment.setCancelable(false);
+                break;
+            case Constants.DIA_NETWORK_ENABLE:
+                dialogFragment = new Dialog_NetworkEnable();
+                dialogFragment.setCancelable(false);
+                break;
+            case Constants.DIA_LOCATION_ENABLE:
+                dialogFragment = new Dialog_LocationEnable();
+                dialogFragment.setCancelable(false);
+                break;
+            case Constants.DIA_RECHARGE:
+                dialogFragment = Dialog_Recharge.newInstance();
+                dialogFragment.setCancelable(true);
+                break;
+//            case Constants.DIA_AFTER_HOUR :
+//                dialogFragment = Dialog_AfterHour.newInstance();
+//                dialogFragment.setCancelable(true);
+//                break;
+//            case Constants.DIA_CANCEL_POLICY :
+//                dialogFragment = Dialog_CancelPolicy.newInstance(bundle);
+//                dialogFragment.setCancelable(true);
+//                break;
+            case Constants.DIA_CANCEL_MEETING:
+                dialogFragment = Dialog_CancelMeeting.newInstance(bundle);
+                dialogFragment.setCancelable(true);
+                break;
+            case Constants.DIA_TOO_EARLY:
+                dialogFragment = Dialog_TooEarly.newInstance(bundle);
+                dialogFragment.setCancelable(true);
+                break;
+            case Constants.DIA_BECOME_TEACHER:
+                dialogFragment = Dialog_BecomeTeacher.newInstance(bundle);
+                dialogFragment.setCancelable(true);
+                break;
+            case Constants.DIA_NETWORK_ERROR:
+                dialogFragment = Dialog_NetWorkError.newInstance(bundle);
+                dialogFragment.setCancelable(true);
+                break;
+            case Constants.DIA_APOLOGIZE:
+                dialogFragment = Dialog_Apologizes.newInstance();
+                dialogFragment.setCancelable(false);
+                break;
+            case Constants.DIA_NO_COACH:
+                dialogFragment = Dialog_NoCoach.newInstance();
+                dialogFragment.setCancelable(true);
+                break;
+            case Constants.DIA_MONEY_EARNED:
+                dialogFragment = Dialog_MoneyEarned.newInstance(bundle);
+                dialogFragment.setCancelable(true);
+                break;
+            case Constants.DIA_REQUEST_UNAVAILABLE:
+                dialogFragment = Dialog_RequestUnavailable.newInstance(bundle);
+                dialogFragment.setCancelable(true);
+                break;
+            case Constants.DIA_ERROR_GENERIC:
+                dialogFragment = Dialog_ErrorGeneric.newInstance(bundle);
+                dialogFragment.setCancelable(true);
+                break;
+        }
+        if (!isFinishing()) {
+            final FragmentManager fm = getSupportFragmentManager();
+            final Fragment currentFragment = fm.findFragmentByTag(Constants.DIALOG_FRAGMENT_TAG);
+            final FragmentTransaction ft = fm.beginTransaction();
+            ft.remove(currentFragment);
+            ft.add(dialogFragment, Constants.DIALOG_FRAGMENT_TAG);
+            ft.commitAllowingStateLoss();
+        }
     }
 
     public static class UalBroadcastReceiver extends BroadcastReceiver {

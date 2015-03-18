@@ -1,0 +1,63 @@
+<!--
+  ~ Copyright (c) 2014. ThanksMister LLC
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <color name="clr_main_ff">#FF0091EA</color> <!-- 100% -->
+    <color name="clr_main_e6">#E60091EA</color> <!-- 90% -->
+    <color name="clr_main_cc">#CC0091EA</color> <!-- 80% -->
+    <color name="clr_main_99">#990091EA</color> <!-- 60% -->
+    <color name="clr_main_77">#770091EA</color> <!-- ~48% -->
+    <color name="clr_body_bg">#FFEEEEEE</color>
+    <color name="clr_font_01">#89000000</color>     <!-- 0.54  -->
+    <color name="clr_font_02">#DD000000</color>     <!-- 0.87 -->
+    <color name="clr_font_03">#42000000</color>     <!-- 0.26 -->
+    <color name="clr_green_01">#FF77B800</color>
+    <color name="clr_green_02">#1477B800</color>    <!-- 0.08 -->
+    <color name="clr_pink_01">#FFFFE4E1</color>
+    <color name="clr_pink_02">#14FFE4E1</color>    <!-- 0.08 -->
+    <color name="clr_orange_01">#FFFF7F50</color>
+    <color name="clr_orange_02">#14FF7F50</color>    <!-- 0.08 -->
+    <color name="clr_slider_bg">#1A000000</color>     <!-- 0.1 -->
+    <color name="clr_btn_green">#FF77B800</color>
+    <color name="clr_btn_green_p">#FF9ACA42</color>
+    <color name="clr_seek_red_ff">#FFD0021B</color>
+    <color name="clr_seek_red_99">#99D0021B</color>
+    <color name="clr_white_dd">#DDFFFFFF</color>
+    <color name="clr_white_a5">#A5FFFFFF</color>
+    <color name="clr_white_64">#64FFFFFF</color>
+    <color name="clr_white_bb">#BBFFFFFF</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="white_alpha_start">#20FFFFFF</color>
+    <color name="dark_green">#D1DF6B</color>
+    <color name="green">#DBE87F</color>
+    <color name="blue">#71CEEA</color>
+    <color name="dark_blue">#31B0D9</color>
+    <color name="transparent_bright_blue">#FF0099FC</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="red">#FA6F45</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="black_bubble">#90000000</color>
+    <color name="light_gray">#E6E6E6</color>
+    <color name="dark_gray">#222222</color>
+    <color name="line_gray">#DEDEDE</color>
+    <color name="medium_gray">#C0C0C0</color>
+    <color name="text">#222222</color>
+    <color name="facebook_blue">#3b5998</color>
+
+
+</resources>

@@ -1,6 +1,168 @@
 <resources>
     <string name="app_name">Ual</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_main">Hellocafe</string>
+    <string name="desc">""</string>
     <string name="action_settings">Settings</string>
+    <string name="login">Log In</string>
+    <string name="connect_with_facebook">CONNECT WITH FACEBOOK</string>
+    <string name="logout">Log Out</string>
+    <string name="login_intro">Check out your Facebook profile by logging in with the button below!</string>
+    <string name="location">Location</string>
+    <string name="getting_your_location">Getting your location</string>
+    <string name="gender">Gender</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="relationship">Relationship</string>
+
+    <string name="s_001">Day</string>
+    <string name="s_002">Time</string>
+    <string name="s_003">Location</string>
+    <string name="s_004">Price</string>
+    <string name="s_005">Day</string>
+    <string name="s_006">Balance</string>
+    <string name="completed">Completed</string>
+    <string name="s_007">RECHARGE</string>
+    <string name="contact_support">Contact Support</string>
+    <string name="add_new_place">Add New Place</string>
+    <string name="enter_place_name">Enter a nickname for the place</string>
+    <string name="enter_place_address">Enter the address</string>
+    <string name="support_contacted">Email sent to customer service</string>
+    <string name="failed_to_contact_support">Failed to contact customer service</string>
+    <string name="become_coach">Become Coach</string>
+    <string name="log_out">Log out</string>
+    <string name="s_011">Location Services</string>
+    <string name="s_012">Your location services are currently disabled. Hellocafe requests your location to be enabled.</string>
+    <string name="s_013">ENABLE</string>
+    <string name="s_014">Network Services</string>
+    <string name="s_015">Your network is currently disabled.\nPlease turn on your Wi-Fi or Data Connection.</string>
+    <string name="s_016">Recharge</string>
+    <string name="recharge_instructions_sent">Recharge instructions email sent</string>
+    <string name="s_017">We sent an email to<![CDATA[" "]]></string>
+    <string name="s_018"><![CDATA[" "]]>with instructions how to recharge your account.</string>
+    <string name="s_019">OK</string>
+    <string name="s_020">Today</string>
+    <string name="s_021">Tomorrow</string>
+    <string name="s_022"><![CDATA["  "]]>/ 1 hour</string>
+    <string name="s_023">Submit</string>
+    <string name="s_024">Meeting time must be in the future</string>
+    <string name="s_026">Cafe not open during selected time</string>
+    <string name="s_028">After Hours</string>
+    <string name="s_029">You made your meeting request after hours. it may take a little longer for a teacher to respond to your request.</string>
+    <string name="s_030">Become a Coach</string>
+    <string name="s_031"><![CDATA[" "]]>with next step for becoming a coach on Hellocafe.</string>
+    <string name="s_033">Cancellation Policy</string>
+    <string name="s_034">Your account will be charged</string>
+    <string name="s_035"><![CDATA[" "]]>if you cancel within one hour of your meeting.</string>
+    <string name="s_036">CHANGE TIME</string>
+    <string name="s_037">CONTINUE</string>
+    <string name="s_038">Are you sure you want to cancel request?</string>
+    <string name="s_039">NO</string>
+    <string name="s_040">YES</string>
+    <string name="cancel_without_fine_msg">Are you sure you want to cancel your meeting with &lt;font color=#000000&gt;%1$s&lt;/font&gt;?</string>
+    <string name="cancel_without_fine_msg_on_site">Make sure to call &lt;font color=#000000&gt;%1$s&lt;/font&gt; if you are having trouble connecting with him/her at the meeting location.</string>
+    <string name="cancel_with_fine_msg">Your meeting is less than 1 hour from now or has already started. If you cancel now your account will be &lt;font color=#000000&gt;suspended&lt;/font&gt;.&lt;br&gt;&lt;br&gt;Make sure to call &lt;font color=#000000&gt;%1$s&lt;/font&gt; if you haven\'t already.</string>
+    <string name="cancel_after_too_long">You have waited too long, the meeting with &lt;font color=#000000&gt;%1$s&lt;/font&gt; is less than 1 hour from now or has already started.&lt;br&gt;&lt;br&gt;Your account will be &lt;font color=#000000&gt;suspended&lt;/font&gt; if you cancel the meeting now.</string>
+    <string name="s_042">is less than 1 hours away.</string>
+    <string name="s_043">if you cancel now your account will be charged </string>
+    <string name="s_044">Too early</string>
+    <string name="s_045">You can<![CDATA["'"]]>t call %1$s until one hour from your scheduled meet up.</string>
+    <string name="s_046">Our Apologies</string>
+    <string name="s_047">We are so sorry. Unfortunately, your teacher had to cancel your meeting. Please try your request again.</string>
+    <string name="s_048">Network Error</string>
+    <string name="cannot_connect_to_facebook">Cannot connect to your Facebook account due to poor network connection.\n\nPlease try again later.</string>
+    <string name="facebook_session_invalidate">Your Facebook session has expired.\n\nPlease clear our app data, re-login your Facebook account, and try again.</string>
+    <string name="parse_config_error">Failed to retrieve configuration values due to server-side errors. Please try again later.</string>
+    <string name="meeting_retrieval_error">Failed to retrieve previous meeting data. Please try again later.</string>
+    <string name="s_049">Experiencing network connection error. Please try again later.</string>
+    <string name="s_050">Searching for Teacher</string>
+    <string name="s_051">We will notify you with \nthe status of your request.</string>
+    <string name="s_052">Price</string>
+    <string name="s_053"><![CDATA["("]]>1 hour<![CDATA[" + "]]>1 drink included<![CDATA[")"]]></string>
+    <string name="s_054">Cancel Request</string>
+    <string name="s_055">Cancel Meeting</string>
+    <string name="s_056">Done</string>
+    <string name="s_057">Meeting Request</string>
+    <string name="s_058">%1$s would like a meeting.</string>
+    <string name="s_059">Sorry.</string>
+    <string name="s_060">Sorry, there is no coach for that time and place. Please try another meeting request.</string>
+    <string name="s_061">Coach Found</string>
+    <string name="s_062">%1$s will be your conversation coach.</string>
+    <string name="s_063">Meeting Canceled</string>
+    <string name="s_064">Sorry, %1$s had to cancel your meeting. Please try your request again.</string>
+    <string name="s_065">Sorry, %1$s had to cancel your meeting. Please check out other pending requests.</string>
+    <string name="s_066"><![CDATA[" "]]>Meetings</string>
+    <string name="s_067">You will be meeting</string>
+    <string name="s_068">You are meeting</string>
+    <string name="s_069">Was <![CDATA["%s"]]> on time?</string>
+    <string name="s_070">Including Drink</string>
+    <string name="s_071">Request Coach</string>
+    <string name="s_072">Invalid Meeting Time</string>
+    <string name="s_073">Please select a time that is at least 30 minutes before meeting time.</string>
+    <string name="s_074">It is now past business hours for a meeting</string>
+    <string name="s_075">market price</string>
+    <string name="s_076">Select Meeting Time</string>
+    <string name="s_077">Select Meeting Location</string>
+    <string name="s_078">When</string>
+    <string name="s_079">Where</string>
+    <string name="s_080">Open Time<![CDATA[": "]]></string>
+
+    <string name="sp_001">MMM<![CDATA[" "]]>dd</string>
+    <string name="sp_002">hh:mm<![CDATA[" "]]>aa</string>
+    <string name="sp_003">hh:mmaa</string>
+
+    <string name="selected_location">SELECT LOCATION</string>
+    <string name="select_location">SELECT LOCATION</string>
+    <string name="how_was_your_meet_up">How was your meeting?</string>
+    <string name="you_met_with">You met with</string>
+    <string name="leave_a_review">Leave a review</string>
+    <string name="submit">submit</string>
+    <string name="your_teacher_is">Your teacher is</string>
+    <string name="pending_requests_capital">PENDING REQUESTS</string>
+    <string name="my_meetings_capital">MY MEETINGS</string>
+    <string name="meeting">Meeting</string>
+    <string name="meetings">Meetings</string>
+    <string name="payments_received">Payments Received</string>
+    <string name="earned">Earned</string>
+    <string name="paid">Paid</string>
+    <string name="pending">Pending</string>
+    <string name="next_payment_date">Next Payment Date</string>
+    <string name="request_pay" translatable="false">Request Pay</string>
+    <string name="there_is_no_pending_request">There is no pending request.</string>
+    <string name="you_have_no_meeting">You have no meeting.</string>
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
+    <string name="accept">accept</string>
+    <string name="accepted">Accepted</string>
+    <string name="decline">decline</string>
+    <string name="canceled">Canceled</string>
+    <string name="remove_from_list">remove from list</string>
+    <string name="not_available">Not Available</string>
+    <string name="request_is_no_longer_available">Request is no longer available.</string>
+    <string name="request_unavailable_generic_error" translatable="false">An error has occurred while retrieving the details of this request.</string>
+    <string name="request_unavailable_accepted" translatable="false">Sorry, another coach has accepted this request already.</string>
+    <string name="request_unavailable_canceled" translatable="false">Sorry, your client has canceled this request.</string>
+    <string name="all_requests_accepted_already" translatable="false">All requests have been accepted by others.</string>
+    <string name="some_requests_accepted_already" translatable="false">Some requests have been accepted by others.</string>
+    <string name="has_been_added_added_to_my_meetings" translatable="false">%1$s has been added to my meetings.</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="you_just_earned">You just earned &lt;font color=#000000&gt;%1$s&lt;/font&gt;. Keep up the good work.</string>
+    <string name="cancel_fine_amount">5000</string>
+    <string name="there_is_no_new_request" translatable="false">No more new requests at this time</string>
+    <string name="there_is_one_new_request" translatable="false">There is 1 new request.</string>
+    <string name="there_are_new_requests" translatable="false">There are %1$s new requests</string>
+    <string name="no_meeting_changed">No meeting update at this time.</string>
+    <string name="a_meeting_canceled">A meeting has been canceled.</string>
+    <string name="meetings_canceled">%1$s meetings have been canceled.</string>
+    <string name="failed_to_cancel">Failed to cancel the meeting, please try again or contact support.</string>
+    <string name="sorry" translatable="false">Sorry</string>
+    <string name="thanks" translatable="false">Thanks</string>
+    <string name="please_adjust_time">Please adjust time</string>
+    <string name="client_time_out_of_sync">The time on your device is out of sync with your actual local time.\n\nPlease go to Settings menu and set the correct time.</string>
+    <string name="loading">Loading&#8230;</string>
+    <string name="loading_market_price">Loading market price&#8230;</string>
+    <string name="account_suspended">Your account has been suspended for cancelling on short notice.\n\nPlease contact support@hellocafe.com to get your account reactivated.</string>
+    <string name="missing_phone_number">Missing Phone Number</string>
+    <string name="s_025">Please select time within business hours</string>
+    <string name="s_032">Would you like to cancel this meeting?</string>
+
 </resources>

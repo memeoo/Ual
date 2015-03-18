@@ -1,8 +1,459 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <!-- Customize your theme here. -->
     </style>
+    <!--
+    <style name="AppTheme" parent="Theme.Base.AppCompat.Light">
+        <item name="android:windowNoTitle">false</item>
+        <item name="android:windowTitleSize">0dp</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="android:logo">@drawable/ic_action_logo</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_action_navigation_previous_item</item>
+    </style>
+    -->
 
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@android:color/white</item>
+    </style>
+    
+    <!-- ActionBar styles -->
+    <style name="ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:background">@color/blue</item>
+        <item name="android:titleTextStyle">@style/ActionBarTitleText</item>
+    </style>
+
+    <style name="ActionBarTitleText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:textSize">@dimen/large_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="DialogFullscreen" parent="android:Theme.Holo.Dialog" >
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:alwaysDrawnWithCache">false</item>
+        <item name="android:windowContentOverlay">@null</item>  
+    </style>
+
+    <!--<style name="BorderlessButtonStyle" parent="android:Widget.Holo.Button.Borderless">-->
+        <!--<item name="android:textSize">@dimen/medium_text</item>-->
+        <!--<item name="android:textColor">@color/text</item>-->
+        <!--<item name="android:textStyle">bold</item>-->
+        <!--<item name="android:paddingTop">4dp</item>-->
+        <!--<item name="android:paddingBottom">4dp</item>-->
+        <!--<item name="android:drawSelectorOnTop">true</item>-->
+    <!--</style>-->
+
+    <!--<style name="Button" parent="android:style/Widget.Button">-->
+        <!--<item name="android:textStyle">bold</item>-->
+        <!--<item name="android:textSize">@dimen/medium_text</item>-->
+        <!--&lt;!&ndash;<item name="android:textColor">@color/text</item>&ndash;&gt;-->
+        <!--<item name="android:textColor">@color/button_text_selector</item>-->
+        <!--<item name="android:fontFamily">sans-serif</item>-->
+        <!--<item name="android:layout_height">@dimen/button_layout_height</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonBlue" parent="Button">-->
+        <!--<item name="android:background">@drawable/button_blue_selector</item>-->
+        <!---->
+    <!--</style>-->
+
+    <!--<style name="ButtonGreen" parent="Button">-->
+        <!--<item name="android:background">@drawable/button_green_selector</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonImage" parent="android:style/Widget.ImageButton">-->
+        <!--<item name="android:layout_height">@dimen/button_layout_height</item>-->
+        <!--<item name="android:adjustViewBounds">true</item>-->
+        <!--<item name="android:scaleType">fitCenter</item>-->
+        <!--<item name="android:padding">@dimen/button_padding</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonAdd" parent="ButtonImage">-->
+        <!--<item name="android:background">@drawable/button_green_selector</item>-->
+        <!--<item name="android:src">@drawable/button_add_selector</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonX" parent="ButtonImage">-->
+        <!--<item name="android:background">@drawable/button_red_selector</item>-->
+        <!--<item name="android:src">@drawable/button_x_selector</item>    -->
+    <!--</style>-->
+
+    <!--<style name="ButtonRed" parent="Button">-->
+        <!--<item name="android:background">@drawable/button_red_selector</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonSecondary" parent="Button">-->
+        <!--<item name="android:background">@drawable/button_secondary_selector</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonPill" parent="ButtonGreen">-->
+        <!--<item name="android:textStyle">normal</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonWelcome" parent="ButtonImage">-->
+        <!--<item name="android:layout_height">@dimen/button_layout_height</item>-->
+        <!--<item name="android:adjustViewBounds">true</item>-->
+        <!--<item name="android:scaleType">fitCenter</item>-->
+        <!--<item name="android:padding">@dimen/button_padding</item>-->
+        <!--<item name="android:textSize">@dimen/medium_text</item>-->
+        <!--<item name="android:textColor">@color/text</item>-->
+        <!--<item name="android:fontFamily">sans-serif</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonWelcome.Add" parent="ButtonWelcome">-->
+        <!--<item name="android:background">@drawable/button_green_selector</item>-->
+        <!--<item name="android:src">@drawable/button_add_selector</item>-->
+    <!--</style>-->
+
+    <!--<style name="ButtonWelcome.X" parent="ButtonWelcome">-->
+        <!--<item name="android:background">@drawable/button_x_selector</item>-->
+        <!--<item name="android:src">@drawable/button_x_selector</item>-->
+    <!--</style>-->
+
+    <!--<style name="DrawerItem">-->
+        <!--<item name="android:height">?android:attr/listPreferredItemHeight</item>-->
+    <!--</style>-->
+
+    <!--<style name="DrawerButton" parent="android:Widget.Holo.Button.Borderless">-->
+        <!--<item name="android:textSize">@dimen/medium_text</item>-->
+        <!--<item name="android:textColor">@color/list_item_text_selector</item>-->
+        <!--<item name="android:height">56dp</item>-->
+        <!--<item name="android:drawSelectorOnTop">false</item>-->
+        <!--<item name="android:paddingLeft">12dp</item>-->
+        <!--<item name="android:paddingRight">12dp</item>-->
+        <!--<item name="android:layout_margin">0dp</item>-->
+        <!--<item name="android:background">@drawable/list_item_selector</item>-->
+    <!--</style>-->
+
+    <!--<style name="DividerVertical">-->
+        <!--<item name="android:layout_width">1dip</item>-->
+        <!--<item name="android:layout_height">match_parent</item>-->
+        <!--<item name="android:layout_marginLeft">4dip</item>-->
+        <!--<item name="android:layout_marginRight">4dip</item>-->
+        <!--<item name="android:background">@color/line_gray</item>-->
+    <!--</style>-->
+
+    <!--<style name="DividerVertical.Dark" parent="DividerVertical">>-->
+        <!--<item name="android:background">@color/dark_gray</item>-->
+    <!--</style>-->
+
+    <!--<style name="DividerHorizontal">-->
+        <!--<item name="android:layout_width">match_parent</item>-->
+        <!--<item name="android:layout_height">1dp</item>-->
+        <!--<item name="android:background">@color/line_gray</item>-->
+    <!--</style>-->
+
+    <!--<style name="HorizontalLine">-->
+        <!--<item name="android:layout_width">fill_parent</item>-->
+        <!--<item name="android:layout_height">1dp</item>-->
+        <!--<item name="android:orientation">horizontal</item>-->
+        <!--<item name="android:background">@color/line_gray</item>-->
+    <!--</style>-->
+
+    <style name="Label">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Label.Light" parent="Label">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="Label.Large" parent="Label">
+        <item name="android:textSize">@dimen/large_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Label.Large.White" parent="Label.Large">
+        <item name="android:textColor">@color/white</item>
+    </style>
+    
+    <style name="Label.Large.Light" parent="Label.Large">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="Label.Medium" parent="Label">
+        <item name="android:textSize">@dimen/large_text</item>
+    </style>
+
+    <style name="Label.Medium.Light" parent="Label.Medium">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="Label.Medium.Light.SmallAction" parent="Label.Medium.Light">
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="Label.Medium.Light.SmallAction.White" parent="Label.Medium.Light">
+        <item name="android:textSize">@dimen/medium_text</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Label.Medium.White" parent="Label.Medium">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Label.Medium.Bold.White" parent="Label.Medium.White">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Label.Medium.SmallAction.White" parent="Label.Medium.White">
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+    
+    <style name="Label.Medium.SmallAction.White.Bold" parent="Label.Medium.SmallAction.White">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Label.Small" parent="Label">
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="Label.Small.Bold" parent="Label.Small">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Label.Small.White" parent="Label.Small">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Label.Small.White.Bold" parent="Label.Small.White">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Label.Small.White.Light" parent="Label.Small.White">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="Label.Input" parent="Label">
+        <item name="android:textSize">@dimen/large_text</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="NotifyBar.Title" parent="Label">
+        <item name="android:textSize">@dimen/small_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="NotifyBar.Text" parent="Label">
+        <item name="android:textSize">@dimen/medium_text</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="NotifyBar.Action" parent="NotifyBar.Text">
+        <item name="android:textSize">@dimen/medium_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="txt_me_clr01" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_font_01</item>
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="txt_me_clr03" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_font_03</item>
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="txt_b_clr03" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_font_03</item>
+        <item name="android:textSize">@dimen/big_text</item>
+    </style>
+
+    <style name="txt_s_clr03" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_font_03</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_s_clr01" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_font_01</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_s_clr03_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_font_03</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_me_main_ff" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_main_ff</item>
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="txt_mi_clr01" parent="@android:style/TextAppearance">
+        <item name="android:typeface">sans</item>
+        <item name="android:textColor">@color/clr_font_01</item>
+        <item name="android:textSize">@dimen/micro_text</item>
+    </style>
+
+    <style name="txt_l_main" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_main_ff</item>
+        <item name="android:textSize">@dimen/large_text</item>
+    </style>
+
+    <style name="txt_me_font02" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_font_02</item>
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="txt_s_font01_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_font_01</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_s_clr01_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_font_01</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_b_clr01_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_font_01</item>
+        <item name="android:textSize">@dimen/big_text</item>
+    </style>
+
+    <style name="txt_l_green01_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_green_01</item>
+        <item name="android:textSize">@dimen/large_text</item>
+    </style>
+
+    <style name="txt_me_green01_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_green_01</item>
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="txt_l_orange01_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_orange_01</item>
+        <item name="android:textSize">@dimen/large_text</item>
+    </style>
+
+    <style name="txt_me_orange01_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_orange_01</item>
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="txt_s_main_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_main_ff</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_s_main" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/clr_main_ff</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_s_selector_main" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/selector_mainblue</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_l_clr02_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_font_02</item>
+        <item name="android:textSize">@dimen/large_text</item>
+    </style>
+
+    <style name="txt_l_clr01_l" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/clr_font_01</item>
+        <item name="android:textSize">@dimen/large_text</item>
+    </style>
+
+    <style name="txt_mi_white" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/micro_text</item>
+    </style>
+
+    <style name="txt_s_white" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_me_white" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="txt_b_white" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/big_text</item>
+    </style>
+
+    <style name="txt_h_white" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/huge_text</item>
+    </style>
+
+    <style name="txt_s_black" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="txt_me_black" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="txt_s_selector_black" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/selector_black</item>
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="TeacherRatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/layerlist_teacher_rating</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:maxHeight">48dip</item>
+    </style>
+
+    <style name="TeacherRatingBarSmall" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/layerlist_teacher_rating_small</item>
+        <item name="android:minHeight">16dip</item>
+        <item name="android:maxHeight">16dip</item>
+    </style>
+
+    <style name="boldText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="normalText">
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>
