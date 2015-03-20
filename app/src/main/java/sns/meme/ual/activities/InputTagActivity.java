@@ -1,0 +1,201 @@
+package sns.meme.ual.activities;
+
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import sns.meme.ual.R;
+import sns.meme.ual.base.Common;
+
+//import com.project.whatthehell.R;
+//import com.project.whatthehell.activity.InputNickNameActivity.ServerConnectionTask;
+//import com.project.whtthehell.common.Common;
+//import com.project.whtthehell.common.MakeServerConnection;
+
+public class InputTagActivity extends Activity {
+
+	private Button btnInput, btnFinishTag;
+	private EditText edInputTag;
+	private LinearLayout llAddedTag;
+	private ArrayList<String> tagArr;
+//	private MakeServerConnection tagAddConnect, tagFetchConnect;
+
+	// private ProgressDialog mProgress;
+
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+		layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+		layoutParams.dimAmount = 0.7f;
+		layoutParams.width = LayoutParams.MATCH_PARENT;
+		layoutParams.height = LayoutParams.WRAP_CONTENT;
+
+		getWindow().setAttributes(layoutParams);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.setting);
+
+		edInputTag = (EditText) findViewById(R.id.edInputTag);
+		btnInput = (Button) findViewById(R.id.btnInput);
+		llAddedTag = (LinearLayout) findViewById(R.id.llAddedInputTag);
+		btnFinishTag = (Button) findViewById(R.id.btnFinishTag);
+
+		tagArr = new ArrayList<String>();
+
+		ArrayList<String> fetchTagInfo = new ArrayList<String>();
+		fetchTagInfo.add(Common.nickName);
+		Log.d("meme", " Common.nickNmae => " + Common.nickName);
+		
+//		tagFetchConnect = new MakeServerConnection(fetchTagInfo,
+//				Common.BASIC_URL + Common.FETCH_TAG_PAGE,
+//				Common.FETCH_TAG_KEYWORD);
+
+//		new ServerConnectionTask().execute("fetchTagInfo");
+
+		btnInput.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				TextView addedTV = new TextView(InputTagActivity.this);
+				addedTV.setLayoutParams(new LinearLayout.LayoutParams(
+						LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
+				addedTV.setTextSize(15);
+				addedTV.setPadding(20, 0, 15, 0);
+				addedTV.setText(edInputTag.getText().toString());
+				llAddedTag.addView(addedTV);
+				tagArr.add(edInputTag.getText().toString());
+
+				addedTV.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						llAddedTag.removeView(v);
+						tagArr.remove(((TextView) v).getText().toString());
+					}
+				});
+				edInputTag.setText("");
+
+			}
+		});
+
+		btnFinishTag.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				String tagStr = "";
+				for (int i = 0; i < tagArr.size(); i++) {
+					tagStr = tagStr + tagArr.get(i) + "#";
+				}
+
+//				ArrayList<String> tagInfo = new ArrayList<String>();
+//				tagInfo.add(tagStr);
+//				tagInfo.add(Common.nickName);
+//				tagInfo.add("N"); // isQuestion
+//
+//				tagAddConnect = new MakeServerConnection(tagInfo,
+//						Common.BASIC_URL + Common.TAG_PAGE, Common.TAG_KEYWORD);
+//				new ServerConnectionTask().execute("tag");
+
+			}
+		});
+
+	};
+
+//	class ServerConnectionTask extends AsyncTask<String, Void, String> {
+//		private JSONObject jReader = null;
+//		private JSONArray jArray = null;
+//		private boolean isNoTag;
+//
+//		@Override
+//		protected String doInBackground(String... urls) {
+//
+//			String result = "";
+//
+//			try {
+//				// Data Parsing From Server
+//				if (urls[0].equalsIgnoreCase("tag")) {
+//					result = tagAddConnect.sendData();
+//					jReader = new JSONObject(result);
+//				} else {
+//					result = tagFetchConnect.sendData();
+//					jReader = new JSONObject(result);
+//					jArray = jReader.getJSONArray("fetchTag");
+//
+//				}
+//				Log.d("meme", " do in background result => " + result);
+//
+//			}catch (JSONException e) {
+//				isNoTag = true;
+//			}
+//			catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			return result;
+//		}
+//
+//		@Override
+//		protected void onPostExecute(String result) {
+//			super.onPostExecute(result);
+//
+//			String serverResponseMessage = "";
+//			Log.d("meme", " result >>> " + result);
+//
+//			if (result.contains("succeed")) {
+//				serverResponseMessage = "성공적으로 입력되었습니다."; // DB 입력 완료 후
+//				if (result.contains("fetchTag")) {
+//					if (!isNoTag) {
+//						for (int i = 0; i < jArray.length(); i++) {
+//							try {
+//								tagArr.add(jArray.getJSONObject(i).optString("tag"));
+//
+//								TextView addedTV = new TextView(
+//										InputTagActivity.this);
+//								addedTV.setLayoutParams(new LinearLayout.LayoutParams(
+//										LayoutParams.WRAP_CONTENT,
+//										LayoutParams.MATCH_PARENT));
+//								addedTV.setTextSize(15);
+//								addedTV.setPadding(20, 0, 15, 0);
+//								addedTV.setText(tagArr.get(i));
+//
+//								addedTV.setOnClickListener(new OnClickListener() {
+//									@Override
+//									public void onClick(View v) {
+//										llAddedTag.removeView(v);
+//										tagArr.remove(((TextView) v).getText().toString());
+//									}
+//								});
+//
+//								llAddedTag.addView(addedTV);
+//							} catch (Exception e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+//						}
+//					}
+//				} else if (result.contains("inputTag")) {
+//					finish();
+//				}
+//
+//			} else {
+//				serverResponseMessage = "죄송합니다. 네트워크 및 서버 오류 입니다. 잠시 후 다시 입력 부탁드립니다.";
+//			}
+//			Log.d("meme", " $$$$$ " + serverResponseMessage);
+//		}
+//	}
+
+}

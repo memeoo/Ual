@@ -9,9 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.hellocafe.android.R;
-import com.hellocafe.android.base.Constants;
-import com.hellocafe.android.events.MyEvent;
+
+import sns.meme.ual.R;
+import sns.meme.ual.base.Constants;
+import sns.meme.ual.event.MyEvent;
 
 import de.greenrobot.event.EventBus;
 

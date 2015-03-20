@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/input_nick"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <EditText
+            android:id="@+id/edInputTag"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:hint="등록  TAG"
+            android:lines="1" />
+
+        <Button
+            android:id="@+id/btnInput"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="Input" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llAddedInputTag"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center" >
+
+        <Button
+            android:id="@+id/btnFinishTag"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:text="등록 완료" >
+        </Button>
+    </LinearLayout>
+
+</LinearLayout>
