@@ -34,6 +34,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.ParseObject;
+
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
 
@@ -62,6 +64,7 @@ public class QuestionActivity extends Activity {
 	private File photoFile;
 	private LinearLayout llAddedTag;
 	private ArrayList<String> tagArr;
+    private ParseObject questionObj;
 
 	
 	@SuppressLint("NewApi")
@@ -139,7 +142,15 @@ public class QuestionActivity extends Activity {
 					for(int i=0; i < tagArr.size() ; i++){
 						tagStr = tagArr.get(i) + "#";
 					}
-					
+
+                    questionObj = new ParseObject("Question");
+                    questionObj.put("Question", edQuestion.getText().toString());
+                    questionObj.put("Questioner",Common.nickName);
+                    questionObj.put("QuestionTag", tagStr);
+//                    questionObj.put("")
+
+
+
 //					String questionStr = edQuestion.getText().toString();
 //
 //					qustionInfo = new ArrayList<String>();

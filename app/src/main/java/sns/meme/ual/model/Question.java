@@ -1,8 +1,10 @@
 package sns.meme.ual.model;
 
+import com.parse.ParseObject;
+
 import java.util.Date;
 
-public class Question {
+public class Question extends ParseObject {
 	private String qId;
 	private String qText;
 	private String questioner;

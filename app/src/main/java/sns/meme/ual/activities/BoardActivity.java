@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import sns.meme.ual.R;
@@ -65,7 +66,8 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         btnGallery.setOnClickListener(this);
         btnSetting.setOnClickListener(this);
 
-
+        Common.nickName = Common.getPreferences(getBaseContext(),"nickName");
+        Common.phoneNum = Common.getPreferences(getBaseContext(),"phoneNum");
 
 //		imgURL = Common.IMG_FILE_PATH + phoneNum + "/" + regId + "/_";
 

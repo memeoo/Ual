@@ -1,22 +1,16 @@
 package sns.meme.ual.activities;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -28,7 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.parse.GetCallback;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -49,35 +43,36 @@ import sns.meme.ual.base.Common;
 //import com.project.whtthehell.common.MakeServerConnection;
 
 public class InputNickNameActivity extends Activity {
-	
-	private Button btnDone;
-	private EditText edInputNick;
-	private String nickName;
-	
-//	private MakeServerConnection memberAddConnect;
+
+    private Button btnDone;
+    private EditText edInputNick;
+    private String nickName;
+
+    //	private MakeServerConnection memberAddConnect;
 //	private ProgressDialog mProgress;
-	private ArrayList<String> memberInfo;
-	
-//	private GoogleCloudMessaging gcm;
-	private AtomicInteger msgId = new AtomicInteger();
-	private SharedPreferences prefs;
-	private Context context;
-	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-	private String regid;
-	
-	@SuppressLint("NewApi")
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-		layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-		layoutParams.dimAmount = 0.7f;
-		getWindow().setAttributes(layoutParams);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.register_nick);
-		
-		edInputNick = (EditText)findViewById(R.id.edInputNick);
-		btnDone = (Button)findViewById(R.id.btnDone);
-		
+    private ArrayList<String> memberInfo;
+
+    //	private GoogleCloudMessaging gcm;
+    private AtomicInteger msgId = new AtomicInteger();
+    private SharedPreferences prefs;
+    private Context context;
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private String regid;
+    private ParseObject memberObject;
+
+    @SuppressLint("NewApi")
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        layoutParams.dimAmount = 0.7f;
+        getWindow().setAttributes(layoutParams);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.register_nick);
+
+        edInputNick = (EditText) findViewById(R.id.edInputNick);
+        btnDone = (Button) findViewById(R.id.btnDone);
+        memberObject = new ParseObject("Member");
 //		if(checkPlayServices()){
 //			Log.d("meme", "Keep Going~ !");
 //
@@ -100,41 +95,84 @@ public class InputNickNameActivity extends Activity {
 //			);
 //			mDailog.getDialog().show();
 //		}
-		 
-		btnDone.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				nickName = edInputNick.getText().toString();
-				Common.savePreferences(getBaseContext(), "nickName", nickName);
-				Common.nickName = Common.getPreferences(getBaseContext(), "nickName"); 
-				
-				TelephonyManager telManager = (TelephonyManager)getBaseContext().getSystemService(getBaseContext().TELEPHONY_SERVICE); 
-				Common.phoneNum = telManager.getLine1Number().substring(1, telManager.getLine1Number().length());
-                Common.savePreferences(getBaseContext(), "phoneNum", Common.phoneNum);
 
-				Log.d("meme", " phoneNum => " + Common.phoneNum);
-				Log.d("meme", " nickName => " + Common.nickName);
+        btnDone.setOnClickListener(new OnClickListener() {
 
-                ParseObject memberObject = new ParseObject("Member");
+            @Override
+            public void onClick(View v) {
+                nickName = edInputNick.getText().toString();
+                Common.savePreferences(getBaseContext(), "nickName", nickName);
+                Common.nickName = Common.getPreferences(getBaseContext(), "nickName");
 
-                memberObject.put("phoneNum", Common.phoneNum);
-                memberObject.put("nickName", Common.nickName);
+                TelephonyManager telManager = (TelephonyManager) getBaseContext().getSystemService(getBaseContext().TELEPHONY_SERVICE);
+                Common.phoneNum = telManager.getLine1Number().substring(1, telManager.getLine1Number().length());
 
 
-                memberObject.saveInBackground(new SaveCallback() {
+                Log.d("meme", " phoneNum => " + Common.phoneNum);
+                Log.d("meme", " nickName => " + Common.nickName);
+
+                ParseQuery memberQuery = ParseQuery.getQuery("Member");
+                memberQuery.whereEqualTo("nickName", Common.nickName);
+                memberQuery.findInBackground(new FindCallback<ParseObject>() {
                     @Override
-                    public void done(ParseException e) {
-                        if(e != null){
-                            if(e.getCode() == 111){
-                                Toast.makeText(getBaseContext(),"Already Registered !!", Toast.LENGTH_SHORT).show();
+                    public void done(List<ParseObject> list, ParseException e) {
+
+                        if (e == null) {
+                            Log.d("meme", " list Size => " + list.size());
+                            if (list.size() > 0) {
+                                Toast.makeText(getBaseContext(), "This ID is already being used ", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.d("meme", " Common.phoneNum => " + Common.phoneNum);
+
+                                memberObject.put("phoneNum", Common.phoneNum);
+                                memberObject.put("nickName", Common.nickName);
+
+                                memberObject.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e != null) {
+                                            Log.d("meme", " e => " + e.toString());
+                                        } else {
+                                            Common.savePreferences(getBaseContext(), "phoneNum", Common.phoneNum);
+                                            Common.savePreferences(getBaseContext(), "nickName", Common.nickName);
+                                            Intent intent = new Intent(getBaseContext(), BoardActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    }
+                                });
                             }
-                        }else{
-                            Intent intent = new Intent(getBaseContext(), BoardActivity.class);
-                            startActivity(intent);
+                        } else {
+                            Log.d("meme", " e=> " + e.toString());
                         }
                     }
+
+//                    @Override
+//                    public void done(Object o, Throwable throwable) {
+//                        Log.d("meme", " throwable => ");
+//                    }
+
                 });
+
+//                ParseObject memberObject = new ParseObject("Member");
+//
+//                memberObject.put("phoneNum", Common.phoneNum);
+//                memberObject.put("nickName", Common.nickName);
+//
+//
+//                memberObject.saveInBackground(new SaveCallback() {
+//                    @Override
+//                    public void done(ParseException e) {
+//                        if (e != null) {
+//                            if (e.getCode() == 111) {
+//                                Toast.makeText(getBaseContext(), "Already Registered !!", Toast.LENGTH_SHORT).show();
+//                            }
+//                        } else {
+//                            Intent intent = new Intent(getBaseContext(), BoardActivity.class);
+//                            startActivity(intent);
+//                        }
+//                    }
+//                });
 
 //                ParseQuery<ParseObject> query = ParseQuery.getQuery("Member");
 //                // Retrieve the object by id
@@ -149,7 +187,7 @@ public class InputNickNameActivity extends Activity {
 //                    }
 //                });
 
-				
+
 //				memberInfo = new ArrayList<String>();
 //				memberInfo.add(nickName);
 //				memberInfo.add(Common.phoneNum);   // Need to change ID after finishing login logic.
@@ -159,13 +197,15 @@ public class InputNickNameActivity extends Activity {
 //						+ Common.MEMBER_PAGE, Common.MEMBER_KEYWORD);
 //
 //				new ServerConnectionTask().execute("member");
-				
-				
-			}
-		});
 
-	};
-	
+
+            }
+        });
+
+    }
+
+    ;
+
 //	private boolean checkPlayServices() {
 //	    int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 //	    if (resultCode != ConnectionResult.SUCCESS) {
@@ -180,7 +220,7 @@ public class InputNickNameActivity extends Activity {
 //	    }
 //	    return true;
 //	}
-	
+
 //	@SuppressLint("NewApi")
 //	private String getRegistrationId(Context context) {
 //	    final SharedPreferences prefs = getGCMPreferences(context);
@@ -208,7 +248,7 @@ public class InputNickNameActivity extends Activity {
 //	    return getSharedPreferences(QuestionActivity.class.getSimpleName(),
 //	            Context.MODE_PRIVATE);
 //	}
-	
+
 //	private void registerInBackground() {
 //
 //		new AsyncTask<String, Void, String>() {
@@ -239,11 +279,11 @@ public class InputNickNameActivity extends Activity {
 //			};
 //		}.execute(null, null, null);
 //	}
-	
+
 //	private void sendRegistrationIdToBackend() {
 //	    // Your implementation here.
 //	}
-	
+
 //	private void storeRegistrationId(Context context, String regId) {
 //	    final SharedPreferences prefs = getGCMPreferences(context);
 //
@@ -255,18 +295,18 @@ public class InputNickNameActivity extends Activity {
 //	    editor.putInt(Common.PROPERTY_APP_VERSION, appVersion);
 //	    editor.commit();
 //	}
-	
-	private static int getAppVersion(Context context) {
-	    try {
-	        PackageInfo packageInfo = context.getPackageManager()
-	                .getPackageInfo(context.getPackageName(), 0);
-	        return packageInfo.versionCode;
-	    } catch (NameNotFoundException e) {
-	        // should never happen
-	        throw new RuntimeException("Could not get package name: " + e);
-	    }
-	}
-	
+
+    private static int getAppVersion(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0);
+            return packageInfo.versionCode;
+        } catch (NameNotFoundException e) {
+            // should never happen
+            throw new RuntimeException("Could not get package name: " + e);
+        }
+    }
+
 //	class ServerConnectionTask extends AsyncTask<String, Void, String> {
 //		private JSONObject jReader = null;
 //

@@ -2,13 +2,7 @@ package sns.meme.ual.activities;
 
 import java.util.ArrayList;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,8 +15,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
+import sns.meme.ual.model.UalMember;
 
 //import com.project.whatthehell.R;
 //import com.project.whatthehell.activity.InputNickNameActivity.ServerConnectionTask;
@@ -58,8 +58,9 @@ public class InputTagActivity extends Activity {
 
 		tagArr = new ArrayList<String>();
 
-		ArrayList<String> fetchTagInfo = new ArrayList<String>();
-		fetchTagInfo.add(Common.nickName);
+//		ArrayList<String> fetchTagInfo = new ArrayList<String>();
+//		fetchTagInfo.add(Common.nickName);
+
 		Log.d("meme", " Common.nickNmae => " + Common.nickName);
 		
 //		tagFetchConnect = new MakeServerConnection(fetchTagInfo,
@@ -102,6 +103,36 @@ public class InputTagActivity extends Activity {
 					tagStr = tagStr + tagArr.get(i) + "#";
 				}
 
+                ParseQuery<ParseObject> tagQuery = ParseQuery.getQuery("Tag");
+                tagQuery.whereEqualTo("nickName", Common.nickName);
+                tagQuery.whereEqualTo("isQuestion", "NO");
+                final String finalTagStr = tagStr;
+                tagQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject parseObject, ParseException e) {
+                        if(e == null){
+                            Log.d("meme", " update !! ");
+
+                            parseObject.put("tag", finalTagStr);
+                            parseObject.saveInBackground();
+
+                        }else{
+                            Log.d("meme", " insert !! ");
+                            Log.d("meme", " finalTagStr => " + finalTagStr);
+                            Log.d("meme", " Common.nickName => " + Common.nickName);
+                            Log.d("meme", " insert !!!!!!! ");
+
+                            UalMember ualMember = new UalMember();
+                            ualMember.setNickName(Common.nickName);
+
+                            ParseObject pObj = new ParseObject("Tag");
+                            pObj.put("tag", finalTagStr);
+                            pObj.put("member", ualMember.getNickName());
+                            pObj.put("isQuestion", "NO");
+                            pObj.saveInBackground();
+                        }
+                    }
+                });
 //				ArrayList<String> tagInfo = new ArrayList<String>();
 //				tagInfo.add(tagStr);
 //				tagInfo.add(Common.nickName);
