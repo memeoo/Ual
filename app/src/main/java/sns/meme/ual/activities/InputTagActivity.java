@@ -19,6 +19,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
@@ -125,11 +126,18 @@ public class InputTagActivity extends Activity {
                             UalMember ualMember = new UalMember();
                             ualMember.setNickName(Common.nickName);
 
+                            Log.d("meme", " ualMember=> " + ualMember.getNickName());
+
                             ParseObject pObj = new ParseObject("Tag");
                             pObj.put("tag", finalTagStr);
-                            pObj.put("member", ualMember.getNickName());
+                            pObj.put("member", ualMember);
                             pObj.put("isQuestion", "NO");
-                            pObj.saveInBackground();
+                            pObj.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    finish();
+                                }
+                            });
                         }
                     }
                 });
