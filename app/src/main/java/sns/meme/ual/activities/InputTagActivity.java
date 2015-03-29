@@ -14,6 +14,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -36,6 +43,7 @@ public class InputTagActivity extends Activity {
 	private EditText edInputTag;
 	private LinearLayout llAddedTag;
 	private ArrayList<String> tagArr;
+    private ParseObject tagParse;
 //	private MakeServerConnection tagAddConnect, tagFetchConnect;
 
 	// private ProgressDialog mProgress;
@@ -63,7 +71,8 @@ public class InputTagActivity extends Activity {
 //		fetchTagInfo.add(Common.nickName);
 
 		Log.d("meme", " Common.nickNmae => " + Common.nickName);
-		
+
+        tagParse = new ParseObject("Tag");
 //		tagFetchConnect = new MakeServerConnection(fetchTagInfo,
 //				Common.BASIC_URL + Common.FETCH_TAG_PAGE,
 //				Common.FETCH_TAG_KEYWORD);
@@ -99,10 +108,42 @@ public class InputTagActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				String tagStr = "";
-				for (int i = 0; i < tagArr.size(); i++) {
-					tagStr = tagStr + tagArr.get(i) + "#";
-				}
+
+                String tagStr = "";
+                for (int i = 0; i < tagArr.size(); i++) {
+                    tagStr = tagStr + tagArr.get(i) + "#";
+                }
+
+                final String finalTagStr = tagStr;
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("Tag");
+
+                query.getInBackground(tagParse.getObjectId(), new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject parseObject, ParseException e) {
+                        if(e == null){
+                            tagParse.put("nickName",Common.nickName);
+                            tagParse.put("tag", finalTagStr);
+                            tagParse.put("isQuetion", "N");
+                            tagParse.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if(e == null){
+                                        Toast.makeText(getBaseContext(),"입력 되었습니다 !", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }else{
+                                        Toast.makeText(getBaseContext(),"입력 에러 !! ", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }else{
+
+                        }
+                    }
+                });
+
+
+
+
 
                 ParseQuery<ParseObject> tagQuery = ParseQuery.getQuery("Tag");
                 tagQuery.whereEqualTo("nickName", Common.nickName);
