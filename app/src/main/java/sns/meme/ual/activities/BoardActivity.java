@@ -19,6 +19,11 @@ import android.widget.GridView;
 import android.os.Environment;
 import android.widget.ImageView;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,6 +35,7 @@ import java.util.ArrayList;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
+import sns.meme.ual.model.UalMember;
 
 
 public class BoardActivity extends UalActivity implements View.OnClickListener {
@@ -76,6 +82,23 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         pageNum = 1;
         imgFetchInfo.add(pageNum+"");
         imgFetchInfo.add(mainShowType);
+
+        ParseQuery meQuery = ParseQuery.getQuery("UalMember");
+        meQuery.whereEqualTo("nickName", Common.nickName);
+        meQuery.getFirstInBackground(new GetCallback() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                Log.d("meme", " getFirstInBackground 11111 ");
+
+            }
+
+            @Override
+            public void done(Object o, Throwable throwable) {
+                Log.d("meme", " getFirstInBackground 22222 ");
+                Common.memberMe = (UalMember)o;
+            }
+        });
+
 
         questionImgArr = new ArrayList<Bitmap>();
 //        Common.setImgLoader(this);

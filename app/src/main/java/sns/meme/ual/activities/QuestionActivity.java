@@ -145,7 +145,7 @@ public class QuestionActivity extends Activity {
 
                     questionObj = new ParseObject("Question");
                     questionObj.put("Question", edQuestion.getText().toString());
-                    questionObj.put("Questioner",Common.nickName);
+                    questionObj.put("Questioner",Common.memberMe);
                     questionObj.put("QuestionTag", tagStr);
 //                    questionObj.put("")
 

@@ -15,6 +15,8 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 
+import sns.meme.ual.model.UalMember;
+
 public class Common {
 	public static final int PICK_FROM_CAMERA = 0;
 	public static final int PICK_FROM_ALBUM = 1;
@@ -40,6 +42,8 @@ public class Common {
 	
 	public static String phoneNum = "";
 	public static String nickName = "";
+
+    public static UalMember memberMe;
 	
 //	private static ImageLoaderConfiguration config;
 //	private static DisplayImageOptions disOptions;

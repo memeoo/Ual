@@ -30,6 +30,7 @@ import com.parse.SaveCallback;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
+import sns.meme.ual.model.UalMember;
 
 
 //import com.google.android.gms.common.ConnectionResult;
@@ -58,7 +59,7 @@ public class InputNickNameActivity extends Activity {
     private Context context;
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private String regid;
-    private ParseObject memberObject;
+    private UalMember memberObject;
 
     @SuppressLint("NewApi")
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,7 @@ public class InputNickNameActivity extends Activity {
 
         edInputNick = (EditText) findViewById(R.id.edInputNick);
         btnDone = (Button) findViewById(R.id.btnDone);
-        memberObject = new ParseObject("Member");
+        memberObject = new UalMember();
 //		if(checkPlayServices()){
 //			Log.d("meme", "Keep Going~ !");
 //
@@ -111,7 +112,7 @@ public class InputNickNameActivity extends Activity {
                 Log.d("meme", " phoneNum => " + Common.phoneNum);
                 Log.d("meme", " nickName => " + Common.nickName);
 
-                ParseQuery memberQuery = ParseQuery.getQuery("Member");
+                ParseQuery memberQuery = ParseQuery.getQuery("UalMember");
                 memberQuery.whereEqualTo("nickName", Common.nickName);
                 memberQuery.findInBackground(new FindCallback<ParseObject>() {
                     @Override

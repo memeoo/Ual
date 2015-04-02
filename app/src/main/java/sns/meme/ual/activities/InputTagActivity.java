@@ -1,6 +1,7 @@
 package sns.meme.ual.activities;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -39,38 +41,40 @@ import sns.meme.ual.model.UalMember;
 
 public class InputTagActivity extends Activity {
 
-	private Button btnInput, btnFinishTag;
-	private EditText edInputTag;
-	private LinearLayout llAddedTag;
-	private ArrayList<String> tagArr;
+    private Button btnInput, btnFinishTag;
+    private EditText edInputTag;
+    private LinearLayout llAddedTag;
+    private ArrayList<String> tagArr;
     private ParseObject tagParse;
+    private ParseQuery tagQuery;
 //	private MakeServerConnection tagAddConnect, tagFetchConnect;
 
-	// private ProgressDialog mProgress;
+    // private ProgressDialog mProgress;
 
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-		layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-		layoutParams.dimAmount = 0.7f;
-		layoutParams.width = LayoutParams.MATCH_PARENT;
-		layoutParams.height = LayoutParams.WRAP_CONTENT;
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        layoutParams.dimAmount = 0.7f;
+        layoutParams.width = LayoutParams.MATCH_PARENT;
+        layoutParams.height = LayoutParams.WRAP_CONTENT;
 
-		getWindow().setAttributes(layoutParams);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.setting);
+        getWindow().setAttributes(layoutParams);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.setting);
 
-		edInputTag = (EditText) findViewById(R.id.edInputTag);
-		btnInput = (Button) findViewById(R.id.btnInput);
-		llAddedTag = (LinearLayout) findViewById(R.id.llAddedInputTag);
-		btnFinishTag = (Button) findViewById(R.id.btnFinishTag);
+        edInputTag = (EditText) findViewById(R.id.edInputTag);
+        btnInput = (Button) findViewById(R.id.btnInput);
+        llAddedTag = (LinearLayout) findViewById(R.id.llAddedInputTag);
+        btnFinishTag = (Button) findViewById(R.id.btnFinishTag);
 
-		tagArr = new ArrayList<String>();
+        tagArr = new ArrayList<String>();
 
 //		ArrayList<String> fetchTagInfo = new ArrayList<String>();
 //		fetchTagInfo.add(Common.nickName);
 
-		Log.d("meme", " Common.nickNmae => " + Common.nickName);
+        Log.d("meme", " Common.nickNmae => " + Common.nickName);
+
 
         tagParse = new ParseObject("Tag");
 //		tagFetchConnect = new MakeServerConnection(fetchTagInfo,
@@ -79,99 +83,107 @@ public class InputTagActivity extends Activity {
 
 //		new ServerConnectionTask().execute("fetchTagInfo");
 
-		btnInput.setOnClickListener(new OnClickListener() {
+        tagQuery = ParseQuery.getQuery("Tag");
+        tagQuery.whereEqualTo("member", Common.memberMe);
+        tagQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
 
-			@Override
-			public void onClick(View v) {
-				TextView addedTV = new TextView(InputTagActivity.this);
-				addedTV.setLayoutParams(new LinearLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
-				addedTV.setTextSize(15);
-				addedTV.setPadding(20, 0, 15, 0);
-				addedTV.setText(edInputTag.getText().toString());
-				llAddedTag.addView(addedTV);
-				tagArr.add(edInputTag.getText().toString());
+                String tagNotSplited = parseObject.get("tag").toString();
+                String[] eachTags = tagNotSplited.split("#");
 
-				addedTV.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						llAddedTag.removeView(v);
-						tagArr.remove(((TextView) v).getText().toString());
-					}
-				});
-				edInputTag.setText("");
+                for (int i = 0; i < eachTags.length; i++) {
+                    tagArr.add(eachTags[i]);
+                    TextView addedTV = new TextView(
+                            InputTagActivity.this);
+                    addedTV.setLayoutParams(new LinearLayout.LayoutParams(
+                            LayoutParams.WRAP_CONTENT,
+                            LayoutParams.MATCH_PARENT));
+                    addedTV.setTextSize(15);
+                    addedTV.setPadding(20, 0, 15, 0);
+                    addedTV.setText(eachTags[i]);
 
-			}
-		});
+                    addedTV.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            llAddedTag.removeView(v);
 
-		btnFinishTag.setOnClickListener(new OnClickListener() {
+                            tagArr.remove(((TextView) v).getText().toString());
+                        }
+                    });
 
-			@Override
-			public void onClick(View v) {
+                    llAddedTag.addView(addedTV);
+                }
+            }
+
+
+        });
+
+
+        btnInput.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                TextView addedTV = new TextView(InputTagActivity.this);
+                addedTV.setLayoutParams(new LinearLayout.LayoutParams(
+                        LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
+                addedTV.setTextSize(15);
+                addedTV.setPadding(20, 0, 15, 0);
+                addedTV.setText(edInputTag.getText().toString());
+                llAddedTag.addView(addedTV);
+                tagArr.add(edInputTag.getText().toString());
+
+                addedTV.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        llAddedTag.removeView(v);
+                        tagArr.remove(((TextView) v).getText().toString());
+                    }
+                });
+                edInputTag.setText("");
+
+            }
+        });
+
+        btnFinishTag.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
 
                 String tagStr = "";
                 for (int i = 0; i < tagArr.size(); i++) {
                     tagStr = tagStr + tagArr.get(i) + "#";
                 }
 
-                final String finalTagStr = tagStr;
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("Tag");
-
-                query.getInBackground(tagParse.getObjectId(), new GetCallback<ParseObject>() {
-                    @Override
-                    public void done(ParseObject parseObject, ParseException e) {
-                        if(e == null){
-                            tagParse.put("nickName",Common.nickName);
-                            tagParse.put("tag", finalTagStr);
-                            tagParse.put("isQuetion", "N");
-                            tagParse.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    if(e == null){
-                                        Toast.makeText(getBaseContext(),"입력 되었습니다 !", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }else{
-                                        Toast.makeText(getBaseContext(),"입력 에러 !! ", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                        }else{
-
-                        }
-                    }
-                });
-
-
-
-
-
                 ParseQuery<ParseObject> tagQuery = ParseQuery.getQuery("Tag");
-                tagQuery.whereEqualTo("nickName", Common.nickName);
+                tagQuery.whereEqualTo("member", Common.memberMe);
                 tagQuery.whereEqualTo("isQuestion", "NO");
                 final String finalTagStr = tagStr;
                 tagQuery.getFirstInBackground(new GetCallback<ParseObject>() {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
-                        if(e == null){
+                        if (e == null) {
                             Log.d("meme", " update !! ");
 
                             parseObject.put("tag", finalTagStr);
-                            parseObject.saveInBackground();
+                            parseObject.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    finish();
+                                }
+                            });
 
-                        }else{
+                        } else {
+                            Log.d("meme", "exception => " + e.toString());
                             Log.d("meme", " insert !! ");
                             Log.d("meme", " finalTagStr => " + finalTagStr);
                             Log.d("meme", " Common.nickName => " + Common.nickName);
                             Log.d("meme", " insert !!!!!!! ");
 
-                            UalMember ualMember = new UalMember();
-                            ualMember.setNickName(Common.nickName);
-
-                            Log.d("meme", " ualMember=> " + ualMember.getNickName());
 
                             ParseObject pObj = new ParseObject("Tag");
                             pObj.put("tag", finalTagStr);
-                            pObj.put("member", ualMember);
+                            pObj.put("member", Common.memberMe);
                             pObj.put("isQuestion", "NO");
                             pObj.saveInBackground(new SaveCallback() {
                                 @Override
@@ -191,10 +203,10 @@ public class InputTagActivity extends Activity {
 //						Common.BASIC_URL + Common.TAG_PAGE, Common.TAG_KEYWORD);
 //				new ServerConnectionTask().execute("tag");
 
-			}
-		});
+            }
+        });
 
-	};
+    };
 
 //	class ServerConnectionTask extends AsyncTask<String, Void, String> {
 //		private JSONObject jReader = null;
