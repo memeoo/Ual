@@ -22,6 +22,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.PushService;
 import com.parse.SaveCallback;
 
 import com.parse.GetCallback;
@@ -169,6 +170,7 @@ public class InputTagActivity extends Activity {
                             parseObject.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
+                                    PushService.subscribe(getBaseContext(), "Giants", BoardActivity.class);
                                     finish();
                                 }
                             });
@@ -185,6 +187,7 @@ public class InputTagActivity extends Activity {
                             pObj.put("tag", finalTagStr);
                             pObj.put("member", Common.memberMe);
                             pObj.put("isQuestion", "NO");
+
                             pObj.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {

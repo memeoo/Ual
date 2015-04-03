@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
@@ -134,8 +135,16 @@ public class InputNickNameActivity extends Activity {
                                         if (e != null) {
                                             Log.d("meme", " e => " + e.toString());
                                         } else {
+
                                             Common.savePreferences(getBaseContext(), "phoneNum", Common.phoneNum);
                                             Common.savePreferences(getBaseContext(), "nickName", Common.nickName);
+
+                                            // Push 등록
+                                            ParseInstallation currentInstallation = ParseInstallation.getCurrentInstallation();
+                                            currentInstallation.put("phoneNum", Common.phoneNum);
+                                            currentInstallation.saveInBackground();
+                                            // ==========
+
                                             Intent intent = new Intent(getBaseContext(), BoardActivity.class);
                                             startActivity(intent);
                                             finish();
