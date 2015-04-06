@@ -29,7 +29,6 @@ public class LoadingActivity extends Activity {
                     Intent intent = new Intent(LoadingActivity.this, InputNickNameActivity.class);
                     startActivity(intent);
                     finish();
-
                 }
 
                 super.handleMessage(msg);

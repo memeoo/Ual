@@ -1,9 +1,13 @@
 package sns.meme.ual.activities;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Handler;
+
 
 import org.json.JSONObject;
 
@@ -22,6 +26,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -34,7 +39,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.exception.DropboxException;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
@@ -48,7 +57,7 @@ import sns.meme.ual.base.Common;
 //import com.project.whtthehell.common.FtpConnect;
 //import com.project.whtthehell.common.MakeServerConnection;
 
-public class QuestionActivity extends Activity {
+public class QuestionActivity extends UalActivity {
 
 	private int requestCode;
 	// private Uri mImageCaptureUri;
@@ -65,6 +74,7 @@ public class QuestionActivity extends Activity {
 	private LinearLayout llAddedTag;
 	private ArrayList<String> tagArr;
     private ParseObject questionObj;
+    private messageHanlder mHandler;
 
 	
 	@SuppressLint("NewApi")
@@ -83,9 +93,8 @@ public class QuestionActivity extends Activity {
 		
 		Bitmap photo = BitmapFactory.decodeFile(savePath);
 		imgQuestion.setImageBitmap(photo);
-		
 		photoToUploadArr = new ArrayList<File>();
-		
+
 		edTag = (EditText)findViewById(R.id.edTag);
 		edQuestion = (EditText)findViewById(R.id.edQuestion);
 		btnQuestion = (Button)findViewById(R.id.btnQuestion);
@@ -107,7 +116,8 @@ public class QuestionActivity extends Activity {
 					}
 
 				});
-		
+
+        mHandler = new messageHanlder();
 		btnInput.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -147,6 +157,41 @@ public class QuestionActivity extends Activity {
                     questionObj.put("Question", edQuestion.getText().toString());
                     questionObj.put("Questioner",Common.memberMe);
                     questionObj.put("QuestionTag", tagStr);
+                    questionObj.put("FileName", questionObj.getObjectId());
+                    questionObj.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+
+                            new Runnable(){
+                                @Override
+                                public void run() {
+                                    File file = new File(questionObj.getObjectId());
+                                    FileInputStream inputStream = null;
+
+                                    try {
+                                        inputStream = new FileInputStream(file);
+                                    } catch (FileNotFoundException e1) {
+                                        e1.printStackTrace();
+                                    }
+
+                                    DropboxAPI.Entry response;
+
+                                    try {
+                                        response = mApp.getDropboxAPI().putFile(questionObj.getObjectId(), inputStream,
+                                                file.length(), null, null);
+                                        Log.i("DbExampleLog", "The uploaded file's rev is: " + response.rev);
+
+                                        Message msg = mHandler.obtainMessage();
+                                        mHandler.sendEmptyMessage(1);
+
+                                    } catch (DropboxException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                            };
+                        }
+                    });
+
 //                    questionObj.put("")
 
 
@@ -257,4 +302,15 @@ public class QuestionActivity extends Activity {
 		cursor.moveToFirst();
 		return cursor.getString(column_index);
 	}
+
+    class messageHanlder extends android.os.Handler{
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+                if(msg.what == 1){
+                    Toast.makeText(getBaseContext(),"Upload Succeed !", Toast.LENGTH_SHORT).show();
+                }
+            }
+    }
 }

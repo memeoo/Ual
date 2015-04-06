@@ -131,6 +131,9 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                         .getExternalStorageDirectory(), url));
                 intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT,
                         mImageCaptureUri);
+
+                Log.d("meme", " mImageCaptureUri => " + mImageCaptureUri.toString());
+
                 startActivityForResult(intent, Common.PICK_FROM_CAMERA);
 
                 break;
