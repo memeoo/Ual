@@ -41,12 +41,13 @@ import sns.meme.ual.model.UalMember;
 public class BoardActivity extends UalActivity implements View.OnClickListener {
 
     private EditText edSearch;
-    private Uri mImageCaptureUri;
+    private Uri mImageCaptureUri, cropUri;
     private Button btnSearch, btnRefresh, btnCamera, btnGallery, btnSetting;
     private GridView grMain;
     private String imgURL;
     private ArrayList<String> imgFetchInfo;
     private ArrayList<Bitmap> questionImgArr;
+    boolean isFromGallery;
 
 //    private MakeServerConnection fetchImgNameConnect;
     private ProgressDialog mProgress;
@@ -143,8 +144,13 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
                 url = "gallery_" + String.valueOf(System.currentTimeMillis())
                         + ".jpg";
+//                url = "tmp_" + String.valueOf(System.currentTimeMillis())
+//                        + ".jpg";
+
                 mImageCaptureUri = Uri.fromFile(new File(Environment
                         .getExternalStorageDirectory(), url));
+
+                Log.d("meme", " mImageCaptureUri => " + mImageCaptureUri.toString());
 
                 intent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
                 startActivityForResult(intent, Common.PICK_FROM_ALBUM);
@@ -171,10 +177,19 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
             case Common.CROP_FROM_CAMERA:
 
                 final Bundle extras = data.getExtras();
-
+                Log.d("meme", "CROP_FROM_CAMERA ");
                 if (extras != null) {
                     Intent moveIntent = new Intent(this, QuestionActivity.class);
-                    moveIntent.putExtra("crop", mImageCaptureUri.getPath());
+
+                    if(isFromGallery) {
+                        Log.d("meme", " isFromGallery true >>>>>> " + isFromGallery);
+                        Log.d("meme", " isFromGallery true >>>>>> " + cropUri.getPath());
+                        moveIntent.putExtra("crop", cropUri.getPath());
+                    }else{
+                        Log.d("meme", " isFromGallery false >>>>>> " + isFromGallery);
+                        moveIntent.putExtra("crop", mImageCaptureUri.getPath());
+                    }
+
                     moveIntent.putExtra("uri", mImageCaptureUri);
                     startActivity(moveIntent);
                     finish();
@@ -182,20 +197,25 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 break;
             case Common.PICK_FROM_ALBUM: {
                 // 이후의 처리가 카메라와 같으므로 일단 break없이 진행합니다.
+                Log.d("meme", "PICK_FROM_ALBUM ");
                 mImageCaptureUri = data.getData();
                 File original_file = getImageFile(mImageCaptureUri);
+                Log.d("meme", "original_file =>  " + original_file.toString());
+                isFromGallery = true;
+                cropUri = createSaveCropFile();
+                File cpoy_file = new File(cropUri.getPath());
 
-                mImageCaptureUri = createSaveCropFile();
-                File cpoy_file = new File(mImageCaptureUri.getPath());
-
+                Log.d("meme", "cpoy_file =>  " + cpoy_file.toString());
                 // SD카드에 저장된 파일을 이미지 Crop을 위해 복사한다.
-                copyFile(original_file, cpoy_file);
+                boolean isCopySuccess = copyFile(original_file, cpoy_file);
 
+                Log.d("meme", "isCopySuccess =>  " + isCopySuccess);
             }
 
             case Common.PICK_FROM_CAMERA: {
                 // 이미지를 가져온 이후의 리사이즈할 이미지 크기를 결정합니다.
                 // 이후에 이미지 크롭 어플리케이션을 호출하게 됩니다.
+                Log.d("meme", "PICK_FROM_CAMERA ");
                 Intent intent = new Intent("com.android.camera.action.CROP");
                 intent.setDataAndType(mImageCaptureUri, "image/*");
                 intent.putExtra("output", mImageCaptureUri);
@@ -216,6 +236,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 in.close();
             }
         } catch (IOException e) {
+            Log.d("meme", " Exception e >>>> " + e.toString());
             result = false;
         }
         return result;
@@ -235,6 +256,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
             }
             return true;
         } catch (IOException e) {
+            Log.d("meme", " IOException e >>>> " + e.toString());
             return false;
         }
     }

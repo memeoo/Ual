@@ -3,7 +3,9 @@ package sns.meme.ual.activities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Handler;
@@ -75,7 +77,7 @@ public class QuestionActivity extends UalActivity {
 	private ArrayList<String> tagArr;
     private ParseObject questionObj;
     private messageHanlder mHandler;
-
+    private Bitmap photo;
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -89,9 +91,12 @@ public class QuestionActivity extends UalActivity {
 		savePath = getIntent().getStringExtra("crop");
 		mImageCaptureUri = getIntent().getParcelableExtra("uri");
 		
-		Log.d("meme", " mImageCaptureUri => " + mImageCaptureUri);
+		Log.d("meme", " savePath => " + savePath);
 		
-		Bitmap photo = BitmapFactory.decodeFile(savePath);
+		photo = BitmapFactory.decodeFile(savePath);
+
+        Log.d("meme", " savePath => " + photo.getWidth());
+
 		imgQuestion.setImageBitmap(photo);
 		photoToUploadArr = new ArrayList<File>();
 
@@ -165,7 +170,10 @@ public class QuestionActivity extends UalActivity {
                             new Runnable(){
                                 @Override
                                 public void run() {
-                                    File file = new File(questionObj.getObjectId());
+//                                    File file = new File(questionObj.getObjectId());
+
+                                    File file = SaveBitmapToFileCache(photo, questionObj.getObjectId());
+
                                     FileInputStream inputStream = null;
 
                                     try {
@@ -303,6 +311,36 @@ public class QuestionActivity extends UalActivity {
 		return cursor.getString(column_index);
 	}
 
+    private File SaveBitmapToFileCache(Bitmap bitmap, String strFilePath) {
+
+        File fileCacheItem = new File(strFilePath);
+        OutputStream out = null;
+
+        try
+        {
+            fileCacheItem.createNewFile();
+            out = new FileOutputStream(fileCacheItem);
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                out.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return fileCacheItem;
+    }
+
     class messageHanlder extends android.os.Handler{
             @Override
             public void handleMessage(Message msg) {
@@ -313,4 +351,6 @@ public class QuestionActivity extends UalActivity {
                 }
             }
     }
+
+
 }
