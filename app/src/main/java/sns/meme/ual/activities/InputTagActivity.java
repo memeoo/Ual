@@ -20,7 +20,9 @@ import android.widget.Toast;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.PushService;
 import com.parse.SaveCallback;
@@ -48,6 +50,7 @@ public class InputTagActivity extends Activity {
     private ArrayList<String> tagArr;
     private ParseObject tagParse;
     private ParseQuery tagQuery;
+    private String finalTagStr;
 //	private MakeServerConnection tagAddConnect, tagFetchConnect;
 
     // private ProgressDialog mProgress;
@@ -159,7 +162,9 @@ public class InputTagActivity extends Activity {
                 ParseQuery<ParseObject> tagQuery = ParseQuery.getQuery("Tag");
                 tagQuery.whereEqualTo("member", Common.memberMe);
                 tagQuery.whereEqualTo("isQuestion", "NO");
-                final String finalTagStr = tagStr;
+
+
+                finalTagStr = tagStr;
                 tagQuery.getFirstInBackground(new GetCallback<ParseObject>() {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
@@ -170,7 +175,13 @@ public class InputTagActivity extends Activity {
                             parseObject.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
-                                    PushService.subscribe(getBaseContext(), "Giants", BoardActivity.class);
+
+                                    String [] tags = finalTagStr.split("#");
+
+                                    for(String tag: tags) {
+                                        ParsePush.subscribeInBackground(tag);
+                                    }
+
                                     finish();
                                 }
                             });

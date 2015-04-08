@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Handler;
 
@@ -45,6 +46,7 @@ import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.exception.DropboxException;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.SaveCallback;
 
 import sns.meme.ual.R;
@@ -78,6 +80,8 @@ public class QuestionActivity extends UalActivity {
     private ParseObject questionObj;
     private messageHanlder mHandler;
     private Bitmap photo;
+    private String fileName;
+
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -155,14 +159,15 @@ public class QuestionActivity extends UalActivity {
 				try {
 					String tagStr = "";
 					for(int i=0; i < tagArr.size() ; i++){
-						tagStr = tagArr.get(i) + "#";
+						tagStr = tagStr + tagArr.get(i) + "#";
 					}
 
+                    fileName = System.currentTimeMillis()+Common.nickName;
                     questionObj = new ParseObject("Question");
                     questionObj.put("Question", edQuestion.getText().toString());
                     questionObj.put("Questioner",Common.memberMe);
                     questionObj.put("QuestionTag", tagStr);
-                    questionObj.put("FileName", questionObj.getObjectId());
+                    questionObj.put("FileName", fileName);
                     questionObj.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -172,13 +177,14 @@ public class QuestionActivity extends UalActivity {
                                 public void run() {
 //                                    File file = new File(questionObj.getObjectId());
 
-                                    File file = SaveBitmapToFileCache(photo, questionObj.getObjectId());
+                                    File file = SaveBitmapToFileCache(photo, fileName+".jpg");
 
                                     FileInputStream inputStream = null;
 
                                     try {
                                         inputStream = new FileInputStream(file);
                                     } catch (FileNotFoundException e1) {
+                                        Log.d("meme", " FileNotFoundException => " + e1.toString());
                                         e1.printStackTrace();
                                     }
 
@@ -193,10 +199,24 @@ public class QuestionActivity extends UalActivity {
                                         mHandler.sendEmptyMessage(1);
 
                                     } catch (DropboxException e1) {
+                                        Log.d("meme", " DropboxException => " + e1.toString());
                                         e1.printStackTrace();
                                     }
+
+
+                                    LinkedList<String> channels = new LinkedList<String>();
+
+                                    for(String tag: tagArr) {
+                                        channels.add(tag);
+                                    }
+
+                                    ParsePush push = new ParsePush();
+                                    push.setChannels(channels); // Notice we use setChannels not setChannel
+                                    push.setMessage("The Giants won against the Mets 2-3.");
+                                    push.sendInBackground();
+
                                 }
-                            };
+                            }.run();
                         }
                     });
 

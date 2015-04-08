@@ -18,8 +18,11 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.os.Environment;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.parse.FunctionCallback;
 import com.parse.GetCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -32,6 +35,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
@@ -107,6 +111,16 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 //                + Common.IMG_NAME_PAGE, Common.IMGFETCH_KEYWORD);
 //        new ServerConnectionTask().execute("imgFetch");
         grMain = (GridView) findViewById(R.id.glboard);
+
+        ParseCloud.callFunctionInBackground("hello", new HashMap<String, Object>(), new FunctionCallback<String>() {
+            public void done(String result, ParseException e) {
+                if (e == null) {
+                    Toast.makeText(getBaseContext(),result,Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getBaseContext(),e.toString(),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 
