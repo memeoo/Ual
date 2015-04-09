@@ -82,7 +82,7 @@ public class QuestionActivity extends UalActivity {
     private Bitmap photo;
     private String fileName;
 
-	
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +94,11 @@ public class QuestionActivity extends UalActivity {
 
 		savePath = getIntent().getStringExtra("crop");
 		mImageCaptureUri = getIntent().getParcelableExtra("uri");
-		
-		Log.d("meme", " savePath => " + savePath);
-		
-		photo = BitmapFactory.decodeFile(savePath);
 
-        Log.d("meme", " savePath => " + photo.getWidth());
+		Log.d("meme", " savePath (crop) => " + savePath);
+        Log.d("meme", " mImageCaptureUri => " + mImageCaptureUri);
+
+		photo = BitmapFactory.decodeFile(savePath);
 
 		imgQuestion.setImageBitmap(photo);
 		photoToUploadArr = new ArrayList<File>();
@@ -108,10 +107,10 @@ public class QuestionActivity extends UalActivity {
 		edQuestion = (EditText)findViewById(R.id.edQuestion);
 		btnQuestion = (Button)findViewById(R.id.btnQuestion);
 		btnInput = (Button)findViewById(R.id.btnInput);
-		
+
 		llAddedTag = (LinearLayout)findViewById(R.id.lladded);
 		tagArr = new ArrayList<String>();
-		
+
 		mProgress = new ProgressDialog(QuestionActivity.this);
 		mProgress.setTitle("FTP Status");
 		mProgress.setMessage("Uploading...");
@@ -128,7 +127,7 @@ public class QuestionActivity extends UalActivity {
 
         mHandler = new messageHanlder();
 		btnInput.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				TextView addedTV = new TextView(QuestionActivity.this);
@@ -138,7 +137,7 @@ public class QuestionActivity extends UalActivity {
 				addedTV.setText(edTag.getText().toString());
 				llAddedTag.addView(addedTV);
 				tagArr.add(edTag.getText().toString());
-				
+
 				addedTV.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -147,12 +146,12 @@ public class QuestionActivity extends UalActivity {
 					}
 				});
 				edTag.setText("");
-				
+
 			}
 		});
-		
+
 		btnQuestion.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 
@@ -162,23 +161,25 @@ public class QuestionActivity extends UalActivity {
 						tagStr = tagStr + tagArr.get(i) + "#";
 					}
 
-                    fileName = System.currentTimeMillis()+Common.nickName;
+//                    fileName = System.currentTimeMillis()+Common.nickName;
                     questionObj = new ParseObject("Question");
                     questionObj.put("Question", edQuestion.getText().toString());
                     questionObj.put("Questioner",Common.memberMe);
                     questionObj.put("QuestionTag", tagStr);
-                    questionObj.put("FileName", fileName);
+                    questionObj.put("FileName", savePath);
                     questionObj.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
 
-                            new Runnable(){
+                            new Thread(){
                                 @Override
                                 public void run() {
 //                                    File file = new File(questionObj.getObjectId());
 
-                                    File file = SaveBitmapToFileCache(photo, fileName+".jpg");
-
+                                    File file = new File(savePath);
+                                    String [] savePathPart = savePath.split("_");
+                                    String pathPart = savePathPart[0];
+                                    String realFileName = savePathPart[1];
                                     FileInputStream inputStream = null;
 
                                     try {
@@ -191,12 +192,12 @@ public class QuestionActivity extends UalActivity {
                                     DropboxAPI.Entry response;
 
                                     try {
-                                        response = mApp.getDropboxAPI().putFile(questionObj.getObjectId(), inputStream,
+                                        Log.d("meme", " realFileName => " + realFileName);
+                                        response = mApp.getDropboxAPI().putFile(realFileName, inputStream,
                                                 file.length(), null, null);
-                                        Log.i("DbExampleLog", "The uploaded file's rev is: " + response.rev);
+                                        Log.d("meme", "The uploaded file's rev is: " + response.rev);
 
-                                        Message msg = mHandler.obtainMessage();
-                                        mHandler.sendEmptyMessage(1);
+
 
                                     } catch (DropboxException e1) {
                                         Log.d("meme", " DropboxException => " + e1.toString());
@@ -212,11 +213,13 @@ public class QuestionActivity extends UalActivity {
 
                                     ParsePush push = new ParsePush();
                                     push.setChannels(channels); // Notice we use setChannels not setChannel
-                                    push.setMessage("The Giants won against the Mets 2-3.");
+                                    push.setMessage("A question has been added !!");
                                     push.sendInBackground();
 
+                                    Message msg = mHandler.obtainMessage();
+                                    mHandler.sendEmptyMessage(1);
                                 }
-                            }.run();
+                            }.start();
                         }
                     });
 
@@ -234,21 +237,21 @@ public class QuestionActivity extends UalActivity {
 //
 //					questionRegisterConnect = new MakeServerConnection(qustionInfo, Common.BASIC_URL
 //							+ Common.QUESTION_PAGE, Common.QUESTION_KEYWORD);
-					
+
 //					new ServerConnectionTask().execute("question");
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
+
 			}
 		});
-		
-		
+
+
 	}
-	
-	
-	
+
+
+
 	class ServerConnectionTask extends AsyncTask<String, Void, String> {
 		private JSONObject jReader = null;
 
@@ -321,7 +324,7 @@ public class QuestionActivity extends UalActivity {
 			Log.d("meme", " $$$$$ " + serverResponseMessage);
 		}
 	}
-	
+
 	public String getRealPathFromURI(Uri contentUri) {
 		String[] proj = { MediaStore.Images.Media.DATA };
 		Cursor cursor = managedQuery(contentUri, proj, null, null, null);

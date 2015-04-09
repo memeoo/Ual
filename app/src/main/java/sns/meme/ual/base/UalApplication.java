@@ -38,6 +38,7 @@ public class UalApplication extends Application {
 
     }
 
+
     public UalDao getDao() {
         return mDao;
     }

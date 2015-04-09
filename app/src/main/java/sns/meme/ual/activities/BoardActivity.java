@@ -88,6 +88,11 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         imgFetchInfo.add(pageNum+"");
         imgFetchInfo.add(mainShowType);
 
+        if(Common.getPreferences(this,"DropBoxAccessToken") == null){
+            mApp.getDropboxAPI().getSession().startOAuth2Authentication(BoardActivity.this);
+        }
+
+
         ParseQuery meQuery = ParseQuery.getQuery("UalMember");
         meQuery.whereEqualTo("nickName", Common.nickName);
         meQuery.getFirstInBackground(new GetCallback() {
@@ -140,7 +145,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 // 카메라를 호출한다.
                 intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                url = "camera_" + String.valueOf(System.currentTimeMillis())
+                url = "camera_" + String.valueOf(System.currentTimeMillis())+Common.nickName
                         + ".jpg";
                 mImageCaptureUri = Uri.fromFile(new File(Environment
                         .getExternalStorageDirectory(), url));
@@ -156,7 +161,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 // 갤러리에서 가져온다.
                 intent = new Intent(Intent.ACTION_PICK);
 
-                url = "gallery_" + String.valueOf(System.currentTimeMillis())
+                url = "gallery_" + String.valueOf(System.currentTimeMillis())+ Common.nickName
                         + ".jpg";
 //                url = "tmp_" + String.valueOf(System.currentTimeMillis())
 //                        + ".jpg";
@@ -196,11 +201,13 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                     Intent moveIntent = new Intent(this, QuestionActivity.class);
 
                     if(isFromGallery) {
-                        Log.d("meme", " isFromGallery true >>>>>> " + isFromGallery);
-                        Log.d("meme", " isFromGallery true >>>>>> " + cropUri.getPath());
+                        Log.d("meme", " Gallery cropUri.getPath() >>>>>> " + cropUri.getPath());
+                        Log.d("meme", " Gallery mImageCaptureUri.getPath() >>>>>> " + mImageCaptureUri.getPath());
+
                         moveIntent.putExtra("crop", cropUri.getPath());
                     }else{
-                        Log.d("meme", " isFromGallery false >>>>>> " + isFromGallery);
+//                        Log.d("meme", " Camera cropUri.getPath() >>>>>> " + cropUri.getPath());
+                        Log.d("meme", " Camera mImageCaptureUri.getPath() >>>>>> " + mImageCaptureUri.getPath());
                         moveIntent.putExtra("crop", mImageCaptureUri.getPath());
                     }
 
@@ -217,11 +224,11 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 Log.d("meme", "original_file =>  " + original_file.toString());
                 isFromGallery = true;
                 cropUri = createSaveCropFile();
-                File cpoy_file = new File(cropUri.getPath());
+                File copy_file = new File(cropUri.getPath());
 
-                Log.d("meme", "cpoy_file =>  " + cpoy_file.toString());
+                Log.d("meme", "cpoy_file =>  " + copy_file.toString());
                 // SD카드에 저장된 파일을 이미지 Crop을 위해 복사한다.
-                boolean isCopySuccess = copyFile(original_file, cpoy_file);
+                boolean isCopySuccess = copyFile(original_file, copy_file);
 
                 Log.d("meme", "isCopySuccess =>  " + isCopySuccess);
             }
@@ -277,7 +284,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
     private Uri createSaveCropFile() {
         Uri uri;
-        String url = "tmp_" + String.valueOf(System.currentTimeMillis())
+        String url = "tmp_" + String.valueOf(System.currentTimeMillis())+Common.nickName
                 + ".jpg";
         uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
                 url));
@@ -312,6 +319,20 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (mApp.getDropboxAPI().getSession().authenticationSuccessful()) {
+            try {
+                // Required to complete auth, sets the access token on the session
+                mApp.getDropboxAPI().getSession().finishAuthentication();
+
+                String accessToken = mApp.getDropboxAPI().getSession().getOAuth2AccessToken();
+
+                Common.savePreferences(this,"DropBoxAccessToken", accessToken);
+
+            } catch (IllegalStateException e) {
+                Log.i("DbAuthLog", "Error authenticating", e);
+            }
+        }
     }
 
     public class ImageAdapter extends BaseAdapter {
