@@ -86,6 +86,7 @@ public class InputTagActivity extends Activity {
 //				Common.FETCH_TAG_KEYWORD);
 
 //		new ServerConnectionTask().execute("fetchTagInfo");
+        Log.d("meme", " InputTagActivity Common.memberMe >>>> " + Common.memberMe.getObjectId());
 
         tagQuery = ParseQuery.getQuery("Tag");
         tagQuery.whereEqualTo("member", Common.memberMe);

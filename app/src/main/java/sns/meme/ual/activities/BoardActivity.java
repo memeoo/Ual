@@ -106,6 +106,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
             public void done(Object o, Throwable throwable) {
                 Log.d("meme", " getFirstInBackground 22222 ");
                 Common.memberMe = (UalMember)o;
+                Log.d("meme", " BoardActivity Common.memberMe >>>> " + Common.memberMe.getObjectId());
             }
         });
 
