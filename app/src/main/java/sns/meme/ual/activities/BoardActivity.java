@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -20,6 +21,8 @@ import android.os.Environment;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.dropbox.client2.DropboxAPI;
+import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
 import com.parse.ParseCloud;
@@ -36,9 +39,11 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
+import sns.meme.ual.model.Question;
 import sns.meme.ual.model.UalMember;
 
 
@@ -52,6 +57,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     private ArrayList<String> imgFetchInfo;
     private ArrayList<Bitmap> questionImgArr;
     boolean isFromGallery;
+    private ParseQuery imgFileQuery;
 
 //    private MakeServerConnection fetchImgNameConnect;
     private ProgressDialog mProgress;
@@ -118,15 +124,16 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 //        new ServerConnectionTask().execute("imgFetch");
         grMain = (GridView) findViewById(R.id.glboard);
 
-        ParseCloud.callFunctionInBackground("hello", new HashMap<String, Object>(), new FunctionCallback<String>() {
-            public void done(String result, ParseException e) {
-                if (e == null) {
-                    Toast.makeText(getBaseContext(),result,Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(getBaseContext(),e.toString(),Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+//        ParseCloud.callFunctionInBackground("hello", new HashMap<String, Object>(), new FunctionCallback<String>() {
+//            public void done(String result, ParseException e) {
+//                if (e == null) {
+//                    Toast.makeText(getBaseContext(),result,Toast.LENGTH_SHORT).show();
+//                }else{
+//                    Toast.makeText(getBaseContext(),e.toString(),Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+
 
     }
 
@@ -373,81 +380,97 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
     }
 
-//    class ServerConnectionTask extends AsyncTask<String, Void, String> {
-//        private JSONObject jReader = null;
-//        private ArrayList<Question>questionArr;
-//        @Override
-//        protected String doInBackground(String... urls) {
-//
-//            String result = "";
-//            try {
-//                // Data Parsing From Server
-//                result = fetchImgNameConnect.sendData();
-//                jReader = new JSONObject(result);
-//                Log.d("meme", " do in background result => " + result);
-//
-//                questionArr = new ArrayList<Question>();
-//
-//                JSONArray jArray = jReader.getJSONArray("questions");
-//
-//                for(int i=0; i < jArray.length(); i++){
-//
-//                    Question question = new Question(
-//                            jArray.getJSONObject(i).getString("qId"),
-//                            jArray.getJSONObject(i).getString("qText"),
-//                            jArray.getJSONObject(i).getString("questioner"),
-//                            jArray.getJSONObject(i).getString("qTime"),
-//                            jArray.getJSONObject(i).getString("aTime"),
-//                            jArray.getJSONObject(i).getString("answerer"),
-//                            jArray.getJSONObject(i).getString("imgName"));
-//
-//                    questionArr.add(question);
-//
-//                    questionImgArr.add(Common.getImgFromServer(getBaseContext(), Common.IMG_FILE_PATH + jArray.getJSONObject(i).getString("imgName")));
-//                }
-//
-//                // Fetch images ==================
-//
-//
-//                // ====================
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return result;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            super.onPostExecute(result);
-//
-//            String serverResponseMessage = "";
-//            Log.d("meme", " result >>> " + result);
-//
-//            if (result.contains("succeed")) {
-//                serverResponseMessage = "성공적으로 입력되었습니다."; // DB 입력 완료 후
-//
-//                mProgress.dismiss();
-//                Toast.makeText(BoardActivity.this, "Hello !!",
-//                        Toast.LENGTH_SHORT).show();
-//
-//                // 여기
-//                grMain.setAdapter(new ImageAdapter(getBaseContext(), questionImgArr));
-//                grMain.setOnClickListener(new OnClickListener() {
-//
-//                    @Override
-//                    public void onClick(View v) {
-//                        Intent intent = new Intent(getBaseContext(), DetailEachActivity.class);
-//                        startActivity(intent);
-//
-//                    }
-//                });
-//
-//            } else {
-//                serverResponseMessage = "죄송합니다. 네트워크 및 서버 오류 입니다. 잠시 후 다시 입력 부탁드립니다.";
-//            }
-//            Log.d("meme", " $$$$$ " + serverResponseMessage);
-//        }
-//    }
+    class ServerConnectionTask extends AsyncTask<String, Void, String> {
+
+        private ArrayList<Question>questionArr;
+        @Override
+        protected String doInBackground(String... urls) {
+
+            String result = "";
+            try {
+                // Data Parsing From Server
+
+                imgFileQuery = ParseQuery.getQuery("Question");
+                imgFileQuery.findInBackground(new FindCallback() {
+                    @Override
+                    public void done(List list, ParseException e) {
+                        for(int i=0 ; i < list.size(); i++) {
+                            list.get(i).getClass();
+                        }
+                    }
+
+                    @Override
+                    public void done(Object o, Throwable throwable) {
+
+                    }
+                });
+
+                File file = new File("/magnum-opus.txt");
+                FileOutputStream outputStream = new FileOutputStream(file);
+                DropboxAPI.DropboxFileInfo info = mApp.getDropboxAPI().getFile("/magnum-opus.txt", null, outputStream, null);
+                Log.d("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
+
+                questionArr = new ArrayList<Question>();
+
+
+                for(int i=0; i < jArray.length(); i++){
+
+                    Question question = new Question(
+                            jArray.getJSONObject(i).getString("qId"),
+                            jArray.getJSONObject(i).getString("qText"),
+                            jArray.getJSONObject(i).getString("questioner"),
+                            jArray.getJSONObject(i).getString("qTime"),
+                            jArray.getJSONObject(i).getString("aTime"),
+                            jArray.getJSONObject(i).getString("answerer"),
+                            jArray.getJSONObject(i).getString("imgName"));
+
+                    questionArr.add(question);
+
+                    questionImgArr.add(Common.getImgFromServer(getBaseContext(), Common.IMG_FILE_PATH + jArray.getJSONObject(i).getString("imgName")));
+                }
+
+                // Fetch images ==================
+
+
+                // ====================
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            String serverResponseMessage = "";
+            Log.d("meme", " result >>> " + result);
+
+            if (result.contains("succeed")) {
+                serverResponseMessage = "성공적으로 입력되었습니다."; // DB 입력 완료 후
+
+                mProgress.dismiss();
+                Toast.makeText(BoardActivity.this, "Hello !!",
+                        Toast.LENGTH_SHORT).show();
+
+                // 여기
+                grMain.setAdapter(new ImageAdapter(getBaseContext(), questionImgArr));
+                grMain.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getBaseContext(), DetailEachActivity.class);
+                        startActivity(intent);
+
+                    }
+                });
+
+            } else {
+                serverResponseMessage = "죄송합니다. 네트워크 및 서버 오류 입니다. 잠시 후 다시 입력 부탁드립니다.";
+            }
+            Log.d("meme", " $$$$$ " + serverResponseMessage);
+        }
+    }
 
 }
