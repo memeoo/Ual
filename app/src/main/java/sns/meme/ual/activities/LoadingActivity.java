@@ -7,6 +7,9 @@ import android.view.Window;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import com.parse.ParseInstallation;
+
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
 
@@ -16,7 +19,8 @@ public class LoadingActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.loading_main);
 
-         Handler handler = new Handler() {
+
+        Handler handler = new Handler() {
 
             @Override
             public void handleMessage(Message msg) {

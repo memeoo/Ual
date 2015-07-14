@@ -94,31 +94,34 @@ public class InputTagActivity extends Activity {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
 
-                String tagNotSplited = parseObject.get("tag").toString();
-                String[] eachTags = tagNotSplited.split("#");
+                if(e == null) {
+                    String tagNotSplited = parseObject.get("tag").toString();
+                    String[] eachTags = tagNotSplited.split("#");
 
-                for (int i = 0; i < eachTags.length; i++) {
-                    tagArr.add(eachTags[i]);
-                    TextView addedTV = new TextView(
-                            InputTagActivity.this);
-                    addedTV.setLayoutParams(new LinearLayout.LayoutParams(
-                            LayoutParams.WRAP_CONTENT,
-                            LayoutParams.MATCH_PARENT));
-                    addedTV.setTextSize(15);
-                    addedTV.setPadding(20, 0, 15, 0);
-                    addedTV.setText(eachTags[i]);
+                    for (int i = 0; i < eachTags.length; i++) {
+                        tagArr.add(eachTags[i]);
+                        TextView addedTV = new TextView(
+                                InputTagActivity.this);
+                        addedTV.setLayoutParams(new LinearLayout.LayoutParams(
+                                LayoutParams.WRAP_CONTENT,
+                                LayoutParams.MATCH_PARENT));
+                        addedTV.setTextSize(15);
+                        addedTV.setPadding(20, 0, 15, 0);
+                        addedTV.setText(eachTags[i]);
 
-                    addedTV.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            llAddedTag.removeView(v);
+                        addedTV.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                llAddedTag.removeView(v);
 
-                            tagArr.remove(((TextView) v).getText().toString());
-                        }
-                    });
+                                tagArr.remove(((TextView) v).getText().toString());
+                            }
+                        });
 
-                    llAddedTag.addView(addedTV);
+                        llAddedTag.addView(addedTV);
+                    }
                 }
+
             }
 
 
