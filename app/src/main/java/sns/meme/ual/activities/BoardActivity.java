@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +30,11 @@ import android.os.Environment;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
@@ -85,7 +91,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     private String mainShowType;
     private int pageNum;
     private ParseInstallation currentInstallation;
-    private int BITMAP_WIDTH =0, BITMAP_HEIGHT=0;
+    private int BITMAP_WIDTH = 0, BITMAP_HEIGHT = 0;
 
     private final int IMAGE_COUNT_TO_SHOW_IN_ONE_SCREEN = 10;
     private final int THREAD_COUNT_TO_USE_FOR_DECODING = 3;
@@ -93,6 +99,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     private BitmapFactory.Options options;
     private ArrayList<byte[]> arrByteList;
     private ArrayList<ImageDecodingTask> ImageDecodingTaskArr;
+    private ImageLoader imgLoader;
 
     interface OnFinishDownload {
         void onFinish();
@@ -140,6 +147,9 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
         Log.d("meme", "nickName => " + Common.nickName);
         Log.d("meme", "phoneNum => " + Common.phoneNum);
+
+        imgLoader = ImageLoader.getInstance();
+        imgLoader.init(ImageLoaderConfiguration.createDefault(getBaseContext()));
 
         ParseQuery meQuery = ParseQuery.getQuery("UalMember");
         meQuery.whereEqualTo("nickName", Common.nickName);
@@ -213,26 +223,59 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 //                    ArrayList<ParseFile> pfList = new ArrayList<ParseFile>();
 
                     arrByteList = new ArrayList<byte[]>();
+
+
                     // =====
                     long startTime = System.currentTimeMillis();
                     for (ParseObject po : parseObjects) {
 
                         try {
                             ParseFile pf = (ParseFile) po.get("questionImg");
-                            arrByteList.add(pf.getData());
-                        } catch (ParseException e1) {
+                            Log.d("meme", " Image URL => " + pf.getUrl());
+
+                            // ===============
+
+
+                            imgLoader.displayImage(pf.getUrl(), new ImageView(getBaseContext()),
+                                    new SimpleImageLoadingListener() {
+                                        @Override
+                                        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                            Log.d("meme", " Loaded Image => " + loadedImage);
+                                            questionImgArr.add(loadedImage);
+//                                            super.onLoadingComplete(imageUri, view, loadedImage);
+                                            ImageAdapter imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
+                                            grMain.setAdapter(imgAdp);
+                                        }
+
+                                        @Override
+                                        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                                            Log.d("meme", " failReason => " + failReason);
+                                            super.onLoadingFailed(imageUri, view, failReason);
+                                        }
+
+                                        @Override
+                                        public void onLoadingCancelled(String imageUri, View view) {
+                                            super.onLoadingCancelled(imageUri, view);
+                                        }
+                                    });
+
+
+                            // =========
+
+//                                    arrByteList.add(pf.getData());
+                        } catch (Exception e1) {
                             e1.printStackTrace();
+                            Log.d("meme", "Exception => " + e1.toString());
                         }
                     }
 
                     options = new BitmapFactory.Options();
 //                    options.inSampleSize = Common.calculateInSampleSize(options, BITMAP_WIDTH, BITMAP_HEIGHT);
                     options.inSampleSize = 1;
-
                     options.inJustDecodeBounds = false;
-                    ImageDecodingTaskArr = new ArrayList<ImageDecodingTask>();
+//                    ImageDecodingTaskArr = new ArrayList<ImageDecodingTask>();
 
-                    setGrid();
+//                    setGrid();
                     // =====
 
 //                    setOnFinishDownload(new OnFinishDownload() {
@@ -243,8 +286,8 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 //                            grMain.setAdapter(imgAdp);
 //                        }
 //                    });
+//
 //                    ofd.onFinish();
-
                     grMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -265,23 +308,23 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
     }
 
-    public int getMaxCountOfScreen(){
+    public int getMaxCountOfScreen() {
         int maxCnt = (arrByteList.size() / IMAGE_COUNT_TO_SHOW_IN_ONE_SCREEN) + 1;
         return maxCnt;
     }
 
-    public void setGrid(){
+    public void setGrid() {
 
 //      int taskCountOfImgDecoding =  getMaxCountOfScreen() * THREAD_COUNT_TO_USE_FOR_DECODING;
-        int taskCountOfImgDecoding =  arrByteList.size();
+        int taskCountOfImgDecoding = arrByteList.size();
 
 
-        for(int i=0; i < taskCountOfImgDecoding; i++){
+        for (int i = 0; i < taskCountOfImgDecoding; i++) {
             ImageDecodingTaskArr.add(new ImageDecodingTask());
             try {
 //                            ImageDecodingTaskArr.get(i).execute(arrByteList.get(3 * i), arrByteList.get(3 * i + 1), arrByteList.get(3 * i + 2));
                 ImageDecodingTaskArr.get(i).execute(arrByteList.get(i));
-            }catch (IndexOutOfBoundsException indexOutOfBounds){
+            } catch (IndexOutOfBoundsException indexOutOfBounds) {
                 Log.d("meme", " Index Out Of Bounds !!");
 
             }
@@ -289,6 +332,13 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
 //        new ImageDecodingTask().execute(arrByteList.get(0));
 
+    }
+
+    public void setImgToGrid() {
+        ImageLoader.getInstance().denyNetworkDownloads(false);
+        for (int i = 0; i < arrByteList.size(); i++) {
+
+        }
     }
 
     @Override
@@ -314,9 +364,9 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 push.sendInBackground(new SendCallback() {
                     @Override
                     public void done(ParseException e) {
-                        if(e == null){
-                            Log.d("meme", " Sending Push Succeed !!" );
-                        }else{
+                        if (e == null) {
+                            Log.d("meme", " Sending Push Succeed !!");
+                        } else {
                             Log.d("meme", " Sending Push Exception => " + e.toString());
                         }
                     }
@@ -553,14 +603,14 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
     }
 
-    class ImageDecodingTask extends AsyncTask<byte [], Void, Bitmap > {
+    class ImageDecodingTask extends AsyncTask<byte[], Void, Bitmap> {
 
         @Override
-        protected Bitmap doInBackground(byte []... byteArrays) {
+        protected Bitmap doInBackground(byte[]... byteArrays) {
 
-            Bitmap bitmapTo =null;
+            Bitmap bitmapTo = null;
             try {
-                for( int i=0; i < byteArrays.length; i++) {
+                for (int i = 0; i < byteArrays.length; i++) {
                     long startTime = System.currentTimeMillis();
                     Bitmap bitmap = BitmapFactory.decodeByteArray(byteArrays[i], 0, byteArrays[i].length, options);
                     long endTime = System.currentTimeMillis();
@@ -575,7 +625,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         }
 
         @Override
-        protected void onPostExecute(Bitmap  result) {
+        protected void onPostExecute(Bitmap result) {
 
             super.onPostExecute(result);
 //            ImageAdapter imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
