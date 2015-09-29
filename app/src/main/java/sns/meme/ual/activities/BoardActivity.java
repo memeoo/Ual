@@ -13,6 +13,8 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -30,11 +32,15 @@ import android.os.Environment;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
@@ -63,6 +69,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import java.util.logging.LogRecord;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
@@ -100,6 +108,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     private ArrayList<byte[]> arrByteList;
     private ArrayList<ImageDecodingTask> ImageDecodingTaskArr;
     private ImageLoader imgLoader;
+
 
     interface OnFinishDownload {
         void onFinish();
@@ -149,7 +158,27 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         Log.d("meme", "phoneNum => " + Common.phoneNum);
 
         imgLoader = ImageLoader.getInstance();
-        imgLoader.init(ImageLoaderConfiguration.createDefault(getBaseContext()));
+
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.icon_five_fables) // resource or drawable
+                .showImageForEmptyUri(R.drawable.ic_launcher) // resource or drawable
+                .showImageOnFail(R.drawable.ic_launcher) // resource or drawable
+                .resetViewBeforeLoading(false)  // default
+                .cacheInMemory(true) // default
+                .cacheOnDisk(true) // default
+                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default
+                .bitmapConfig(Bitmap.Config.ARGB_8888) // default
+                .build();
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .memoryCache(new LruMemoryCache(4 * 1024 * 1024))
+                .memoryCacheSize(4 * 1024 * 1024)
+                .diskCacheSize(50 * 1024 * 1024)
+                .defaultDisplayImageOptions(options)
+                .build();
+
+
+        imgLoader.init(config);
 
         ParseQuery meQuery = ParseQuery.getQuery("UalMember");
         meQuery.whereEqualTo("nickName", Common.nickName);
@@ -212,71 +241,48 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         grMain = (GridView) findViewById(R.id.glboard);
         imgFileQuery = ParseQuery.getQuery("Question");
 
-//        UalApplication.showProgressDialog(this, "Loading...");
+
         imgFileQuery.orderByAscending("createdAt");
         imgFileQuery.findInBackground(new FindCallback<ParseObject>() {
 
             @Override
             public void done(final List<ParseObject> parseObjects, ParseException e) {
+                UalApplication.showProgressDialog(BoardActivity.this, "Loading...");
                 if (e == null) {
-
-//                    ArrayList<ParseFile> pfList = new ArrayList<ParseFile>();
-
                     arrByteList = new ArrayList<byte[]>();
-
-
-                    // =====
-                    long startTime = System.currentTimeMillis();
-                    for (ParseObject po : parseObjects) {
-
-                        try {
-                            ParseFile pf = (ParseFile) po.get("questionImg");
-                            Log.d("meme", " Image URL => " + pf.getUrl());
-
-                            // ===============
-
-
-                            imgLoader.displayImage(pf.getUrl(), new ImageView(getBaseContext()),
-                                    new SimpleImageLoadingListener() {
-                                        @Override
-                                        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                                            Log.d("meme", " Loaded Image => " + loadedImage);
-                                            questionImgArr.add(loadedImage);
-//                                            super.onLoadingComplete(imageUri, view, loadedImage);
-                                            ImageAdapter imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
-                                            grMain.setAdapter(imgAdp);
-                                        }
-
-                                        @Override
-                                        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                                            Log.d("meme", " failReason => " + failReason);
-                                            super.onLoadingFailed(imageUri, view, failReason);
-                                        }
-
-                                        @Override
-                                        public void onLoadingCancelled(String imageUri, View view) {
-                                            super.onLoadingCancelled(imageUri, view);
-                                        }
-                                    });
-
-
-                            // =========
-
-//                                    arrByteList.add(pf.getData());
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                            Log.d("meme", "Exception => " + e1.toString());
+                    final Handler handler = new Handler() {
+                        @Override
+                        public void handleMessage(Message msg) {
+                            if (msg.what == 1) {
+                                ImageAdapter imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
+                                grMain.setAdapter(imgAdp);
+                                UalApplication.closeProgressDialog();
+                            }
                         }
-                    }
+                    };
 
-                    options = new BitmapFactory.Options();
-//                    options.inSampleSize = Common.calculateInSampleSize(options, BITMAP_WIDTH, BITMAP_HEIGHT);
-                    options.inSampleSize = 1;
-                    options.inJustDecodeBounds = false;
-//                    ImageDecodingTaskArr = new ArrayList<ImageDecodingTask>();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (ParseObject po : parseObjects) {
 
-//                    setGrid();
-                    // =====
+                                try {
+                                    final ParseFile pf = (ParseFile) po.get("questionImg");
+                                    Log.d("meme", " Image URL => " + pf.getUrl());
+
+                                    questionImgArr.add(imgLoader.loadImageSync(pf.getUrl()));
+                                    if (questionImgArr.size() == parseObjects.size()) {
+                                        handler.sendEmptyMessage(1);
+                                    }
+
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
+                                    Log.d("meme", "Exception => " + e1.toString());
+                                }
+                            }
+                        }
+                    }).start();
+
 
 //                    setOnFinishDownload(new OnFinishDownload() {
 //                        @Override
@@ -288,6 +294,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 //                    });
 //
 //                    ofd.onFinish();
+
                     grMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -301,10 +308,14 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 } else {
 
                 }
-//                UalApplication.closeProgressDialog();
+
             }
         });
 
+
+    }
+
+    public synchronized void setImgArrays() {
 
     }
 
@@ -571,11 +582,11 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         }
 
         public Object getItem(int position) {
-            return position;
+            return mThumbIds.get(position);
         }
 
         public long getItemId(int position) {
-            return 0;
+            return position;
         }
 
         @Override
@@ -586,6 +597,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 imageView.setLayoutParams(new GridView.LayoutParams((int) UalApplication.getScreenSizePix(activity)[0] / 3, (int) UalApplication.getScreenSizePix(activity)[1] / 5));
                 imageView.setScaleType(ImageView.ScaleType.FIT_XY);
                 imageView.setPadding(8, 8, 8, 8);
+
             } else {
                 imageView = (ImageView) convertView;
             }
@@ -636,64 +648,5 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         }
     }
 
-//    class imgDecodingTask2 extends AsyncTask<byte [], Void, String> {
-//
-//        @Override
-//        protected String doInBackground(byte []... byteArrays) {
-//
-//            String result = "";
-//            try {
-//                for(int i=0; i < byteArrays.length; i++) {
-//                    long startTime = System.currentTimeMillis();
-//                    Bitmap bitmap = BitmapFactory.decodeByteArray(byteArrays[i], 0, byteArrays[i].length, options);
-//                    long endTime = System.currentTimeMillis();
-//                    Log.d("meme", "spendingTime Thread 2 => " + (endTime - startTime));
-//
-//                    questionImgArr.add(i+3,bitmap);
-//                }
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return result;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            super.onPostExecute(result);
-//
-//
-//
-//        }
-//    }
-//
-//    class imgDecodingTask3 extends AsyncTask<byte [], Void, String> {
-//
-//        @Override
-//        protected String doInBackground(byte []... byteArrays) {
-//
-//            String result = "";
-//            try {
-//                for(int i=0; i < byteArrays.length; i++) {
-//                    long startTime = System.currentTimeMillis();
-//                    Bitmap bitmap = BitmapFactory.decodeByteArray(byteArrays[i], 0, byteArrays[i].length, options);
-//                    long endTime = System.currentTimeMillis();
-//                    Log.d("meme", "spendingTime Thread 2 => " + (endTime - startTime));
-//
-//                    questionImgArr.add(i+6,bitmap);
-//                }
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return result;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            super.onPostExecute(result);
-//
-//        }
-//    }
 
 }
