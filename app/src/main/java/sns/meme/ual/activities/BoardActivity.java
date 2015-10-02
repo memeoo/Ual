@@ -240,14 +240,27 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         questionImgArr = new ArrayList<Bitmap>();
         grMain = (GridView) findViewById(R.id.glboard);
         imgFileQuery = ParseQuery.getQuery("Question");
-
-
         imgFileQuery.orderByAscending("createdAt");
+
+        int queryCnt = 0;
+
+        try {
+            queryCnt = imgFileQuery.count();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        imgFileQuery.setLimit(9);
+        final long startTime = System.currentTimeMillis();
+        UalApplication.showProgressDialog(BoardActivity.this, "Loading...");
+
         imgFileQuery.findInBackground(new FindCallback<ParseObject>() {
 
             @Override
             public void done(final List<ParseObject> parseObjects, ParseException e) {
-                UalApplication.showProgressDialog(BoardActivity.this, "Loading...");
+                long endTime = System.currentTimeMillis();
+                Log.d("meme", " time fast => " + (endTime - startTime) / 100.0f + "");
+
                 if (e == null) {
                     arrByteList = new ArrayList<byte[]>();
                     final Handler handler = new Handler() {

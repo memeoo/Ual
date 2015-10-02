@@ -27,32 +27,33 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:layout_weight="49"
+                android:layout_weight="95"
                 android:ems="10" >
             </EditText>
 
             <Button
                 android:id="@+id/btnSearch"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="17"
-                android:text="Search"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/search"
                 android:textSize="8.5sp" />
 
             <Button
                 android:id="@+id/btnRefresh"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="17"
-                android:text="Refresh"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/agt_reload"
+                android:layout_marginLeft="15dp"
+                android:visibility="gone"
                 android:textSize="8.5sp" />
 
             <Button
                 android:id="@+id/btnSetting"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="17"
-                android:text="Setting"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/settings"
+                android:layout_marginLeft="20dp"
                 android:textSize="8.5sp" />
         </LinearLayout>
 
@@ -60,7 +61,7 @@
             android:id="@+id/glboard"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="80"
+            android:layout_weight="82"
 
 
             android:horizontalSpacing="5dp"
@@ -73,7 +74,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10" >
+            android:gravity="center_vertical"
+            android:layout_weight="8" >
 
             <TextView
                 android:id="@+id/textView1"

@@ -22,11 +22,12 @@
 
             <TextView
                 android:id="@+id/textView1"
-                android:layout_width="0dp"
-                android:layout_weight="10"
-                android:layout_height="wrap_content"
+                android:layout_width="22.5dp"
+                android:background="@drawable/letter_q_silver"
+                android:layout_height="22.5dp"
                 android:layout_marginLeft="5dp"
-                android:text="질문: "
+
+
                 android:textSize="16dp" />
 
             <TextView
@@ -51,21 +52,20 @@
             android:id="@+id/imgQuestion"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="69" />
+            android:layout_weight="60" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16dp"
+            android:layout_width="22.5dp"
+            android:layout_height="22.5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="1"
-            android:text="답변: " />
+            android:background="@drawable/letter_a_silver"
+             />
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="12"
+            android:layout_weight="22"
             android:layout_marginTop="2dp"
             android:fillViewport="true"
             android:id="@+id/scrollView">
@@ -73,7 +73,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingBottom="3.5dp"
+                android:paddingBottom="1.5dp"
                 android:id="@+id/llAddAnswer"
                 android:orientation="vertical"></LinearLayout>
 
@@ -83,7 +83,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="11"
+            android:layout_weight="11.5"
             android:focusable="true"
             android:layout_gravity="bottom"
             android:focusableInTouchMode="true"
@@ -108,7 +108,8 @@
                     android:id="@+id/edAnswer"
                     android:layout_width="0dp"
                     android:layout_weight="67"
-                    android:layout_height="wrap_content"
+                    android:textSize="13dp"
+                    android:layout_height="match_parent"
                     android:ems="10"></EditText>
 
                 <Button
