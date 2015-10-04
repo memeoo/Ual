@@ -1,62 +1,42 @@
 package sns.meme.ual.activities;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.ActivityManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Gallery;
 import android.widget.GridView;
-import android.os.Environment;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.parse.FindCallback;
-import com.parse.FunctionCallback;
 import com.parse.GetCallback;
-import com.parse.GetDataCallback;
-import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseQuery;
-import com.parse.ProgressCallback;
-import com.parse.SaveCallback;
 import com.parse.SendCallback;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,19 +44,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-
-import java.util.logging.LogRecord;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
 import sns.meme.ual.base.UalApplication;
-import sns.meme.ual.externaltools.RecyclingBitmapDrawable;
-import sns.meme.ual.model.Question;
 import sns.meme.ual.model.UalMember;
 
 
@@ -84,31 +57,27 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
     private EditText edSearch;
     private Uri mImageCaptureUri, cropUri;
-    private Button btnSearch, btnRefresh, btnCamera, btnGallery, btnSetting;
+    private Button btnSearch, btnRefresh, btnSetting;
+    private LinearLayout btnCamera, btnGallery;
     private GridView grMain;
-    private String imgURL;
-    private ArrayList<String> imgFetchInfo;
     private ArrayList<Bitmap> questionImgArr;
     boolean isFromGallery;
     private ParseQuery imgFileQuery;
     private static final String TAG = BoardActivity.class.getSimpleName();
 
     private Activity activity;
-    //    private MakeServerConnection fetchImgNameConnect;
-    private ProgressDialog mProgress;
-    private String mainShowType;
-    private int pageNum;
+
     private ParseInstallation currentInstallation;
     private int BITMAP_WIDTH = 0, BITMAP_HEIGHT = 0;
 
-    private final int IMAGE_COUNT_TO_SHOW_IN_ONE_SCREEN = 10;
-    private final int THREAD_COUNT_TO_USE_FOR_DECODING = 3;
 
-    private BitmapFactory.Options options;
-    private ArrayList<byte[]> arrByteList;
-    private ArrayList<ImageDecodingTask> ImageDecodingTaskArr;
     private ImageLoader imgLoader;
+    private static final int FIRST_SHOW_COUNT = 18;
+    private static final int IMG_CNT_PER_ONE_SCROLL = 18;
 
+    private ImageAdapter imgAdp;
+    private int queryCnt;
+    private int scrollCnt = 1;
 
     interface OnFinishDownload {
         void onFinish();
@@ -124,16 +93,23 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setView();
+        setImageLoader();
+        setCommonVarilable();
+        meQuery();
+        imgFileQuery(0,FIRST_SHOW_COUNT);
 
+    }
+
+    public void setView() {
+        activity = BoardActivity.this;
         setContentView(R.layout.activity_board);
 
-        activity = BoardActivity.this;
         edSearch = (EditText) findViewById(R.id.edSearch);
-
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btnRefresh = (Button) findViewById(R.id.btnRefresh);
-        btnCamera = (Button) findViewById(R.id.btnCamera);
-        btnGallery = (Button) findViewById(R.id.btnGallery);
+        btnCamera = (LinearLayout) findViewById(R.id.btnCamera);
+        btnGallery = (LinearLayout) findViewById(R.id.btnGallery);
         btnSetting = (Button) findViewById(R.id.btnSetting);
 
         btnSearch.setOnClickListener(this);
@@ -142,21 +118,15 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         btnGallery.setOnClickListener(this);
         btnSetting.setOnClickListener(this);
 
-        Common.nickName = Common.getPreferences(getBaseContext(), "nickName");
-        Common.phoneNum = Common.getPreferences(getBaseContext(), "phoneNum");
+        grMain = (GridView) findViewById(R.id.glboard);
 
         BITMAP_WIDTH = (int) UalApplication.getScreenSizePix(activity)[0] / 3;
         BITMAP_HEIGHT = (int) UalApplication.getScreenSizePix(activity)[1] / 5;
+        questionImgArr = new ArrayList<Bitmap>();
 
-//        imgFetchInfo = new ArrayList<String>();
-//        mainShowType = "all";
-//        pageNum = 1;
-//        imgFetchInfo.add(pageNum + "");
-//        imgFetchInfo.add(mainShowType);
+    }
 
-        Log.d("meme", "nickName => " + Common.nickName);
-        Log.d("meme", "phoneNum => " + Common.phoneNum);
-
+    public void setImageLoader() {
         imgLoader = ImageLoader.getInstance();
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()
@@ -170,16 +140,25 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 .bitmapConfig(Bitmap.Config.ARGB_8888) // default
                 .build();
 
+        final int memClass = ((ActivityManager) this.getSystemService(
+                Context.ACTIVITY_SERVICE)).getMemoryClass();
+
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
-                .memoryCache(new LruMemoryCache(4 * 1024 * 1024))
+                .memoryCache(new LruMemoryCache(memClass * 1024 * 1024 / 8))
                 .memoryCacheSize(4 * 1024 * 1024)
                 .diskCacheSize(50 * 1024 * 1024)
                 .defaultDisplayImageOptions(options)
                 .build();
 
-
         imgLoader.init(config);
+    }
 
+    public void setCommonVarilable() {
+        Common.nickName = Common.getPreferences(getBaseContext(), "nickName");
+        Common.phoneNum = Common.getPreferences(getBaseContext(), "phoneNum");
+    }
+
+    public void meQuery() {
         ParseQuery meQuery = ParseQuery.getQuery("UalMember");
         meQuery.whereEqualTo("nickName", Common.nickName);
         meQuery.getFirstInBackground(new GetCallback() {
@@ -203,54 +182,40 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
 
-
                     }
 
                     @Override
                     public void done(Object o, Throwable throwable) {
-//                        if (o != null) {
-//                            Log.d("meme", " ==== >>>>>>>>>> ===== " + o.getClass());
-//                            ParseObject po = (ParseObject) o;
-//                            String tagNotSplited = po.getString("tag");
-//
-//                            String[] eachTags = tagNotSplited.split("#");
-//
-//                            Log.d("meme", " tags ==> " + tagNotSplited);
-//
-//                            currentInstallation = ParseInstallation.getCurrentInstallation();
-//                            currentInstallation.addAllUnique("channels", Arrays.asList(eachTags));
-//                            currentInstallation.saveInBackground(new SaveCallback() {
-//                                @Override
-//                                public void done(ParseException e) {
-//                                    if (e == null) {
-//                                        Log.d("meme", " Push Registration Finish !!");
-//                                    } else {
-//                                        Log.d("meme", " @@@@ e => " + e.toString());
-//                                    }
-//                                }
-//                            });
-//
-//                        }
+
                     }
                 });
             }
         });
+    }
 
+    public boolean isLast(int limitCnt){
+        boolean isLast = false;
 
-        questionImgArr = new ArrayList<Bitmap>();
-        grMain = (GridView) findViewById(R.id.glboard);
-        imgFileQuery = ParseQuery.getQuery("Question");
-        imgFileQuery.orderByAscending("createdAt");
-
-        int queryCnt = 0;
-
-        try {
-            queryCnt = imgFileQuery.count();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if(limitCnt > queryCnt ){
+            isLast = true;
         }
 
-        imgFileQuery.setLimit(9);
+        return isLast;
+    }
+
+    public void imgFileQuery(int skipCnt, int limitCnt) {
+        imgFileQuery = ParseQuery.getQuery("Question");
+        imgFileQuery.orderByDescending("createdAt");
+
+
+//        try {
+//            queryCnt = imgFileQuery.count();
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+
+        imgFileQuery.setSkip(skipCnt);
+        imgFileQuery.setLimit(limitCnt);
         final long startTime = System.currentTimeMillis();
         UalApplication.showProgressDialog(BoardActivity.this, "Loading...");
 
@@ -262,14 +227,16 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 Log.d("meme", " time fast => " + (endTime - startTime) / 100.0f + "");
 
                 if (e == null) {
-                    arrByteList = new ArrayList<byte[]>();
+                    queryCnt = parseObjects.size();
                     final Handler handler = new Handler() {
                         @Override
                         public void handleMessage(Message msg) {
                             if (msg.what == 1) {
-                                ImageAdapter imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
+                                imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
                                 grMain.setAdapter(imgAdp);
                                 UalApplication.closeProgressDialog();
+                            } else if (msg.what == 2) {
+                                imgAdp.notifyDataSetChanged();
                             }
                         }
                     };
@@ -284,8 +251,10 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                                     Log.d("meme", " Image URL => " + pf.getUrl());
 
                                     questionImgArr.add(imgLoader.loadImageSync(pf.getUrl()));
-                                    if (questionImgArr.size() == parseObjects.size()) {
-                                        handler.sendEmptyMessage(1);
+                                    if (questionImgArr.size() == Math.floor(FIRST_SHOW_COUNT / 2)) {    //절반값에 도달하면
+                                        handler.sendEmptyMessage(1); // adapter set 한다.
+                                    } else if (questionImgArr.size() == FIRST_SHOW_COUNT || questionImgArr.size() == parseObjects.size()) {
+                                        handler.sendEmptyMessage(2); // adapter notifyDataSetChange 한다.
                                     }
 
                                 } catch (Exception e1) {
@@ -295,18 +264,6 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                             }
                         }
                     }).start();
-
-
-//                    setOnFinishDownload(new OnFinishDownload() {
-//                        @Override
-//                        public void onFinish() {
-//                            Log.d("meme", " onFinish !!");
-//                            ImageAdapter imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
-//                            grMain.setAdapter(imgAdp);
-//                        }
-//                    });
-//
-//                    ofd.onFinish();
 
                     grMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -324,45 +281,6 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
             }
         });
-
-
-    }
-
-    public synchronized void setImgArrays() {
-
-    }
-
-    public int getMaxCountOfScreen() {
-        int maxCnt = (arrByteList.size() / IMAGE_COUNT_TO_SHOW_IN_ONE_SCREEN) + 1;
-        return maxCnt;
-    }
-
-    public void setGrid() {
-
-//      int taskCountOfImgDecoding =  getMaxCountOfScreen() * THREAD_COUNT_TO_USE_FOR_DECODING;
-        int taskCountOfImgDecoding = arrByteList.size();
-
-
-        for (int i = 0; i < taskCountOfImgDecoding; i++) {
-            ImageDecodingTaskArr.add(new ImageDecodingTask());
-            try {
-//                            ImageDecodingTaskArr.get(i).execute(arrByteList.get(3 * i), arrByteList.get(3 * i + 1), arrByteList.get(3 * i + 2));
-                ImageDecodingTaskArr.get(i).execute(arrByteList.get(i));
-            } catch (IndexOutOfBoundsException indexOutOfBounds) {
-                Log.d("meme", " Index Out Of Bounds !!");
-
-            }
-        }
-
-//        new ImageDecodingTask().execute(arrByteList.get(0));
-
-    }
-
-    public void setImgToGrid() {
-        ImageLoader.getInstance().denyNetworkDownloads(false);
-        for (int i = 0; i < arrByteList.size(); i++) {
-
-        }
     }
 
     @Override
@@ -422,8 +340,6 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
                 url = "gallery_" + String.valueOf(System.currentTimeMillis()) + Common.nickName
                         + ".jpg";
-//                url = "tmp_" + String.valueOf(System.currentTimeMillis())
-//                        + ".jpg";
 
                 mImageCaptureUri = Uri.fromFile(new File(Environment
                         .getExternalStorageDirectory(), url));
@@ -566,7 +482,6 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
         if (mCursor != null) {
             mCursor.close();
-            mCursor = null;
         }
 
         return new File(path);
@@ -615,51 +530,22 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 imageView = (ImageView) convertView;
             }
 
-            imageView.setImageBitmap(mThumbIds.get(position));
+            if (position < mThumbIds.size()) {
+                imageView.setImageBitmap(mThumbIds.get(position));
+            }
 
-//            if(imageView != null)
-//            {
-//                imageView.setImageBitmap(mThumbIds.get(position));
-//                notifyDataSetChanged();  //Calling this helped to solve the problem.
-//            }
+            if (position >= queryCnt-2) {
+                scrollCnt++;
+                Log.d("meme", " position !! => " + position + " scrollCnt => " + scrollCnt);
+                if(!isLast(FIRST_SHOW_COUNT)) {
+                    imgFileQuery(queryCnt, IMG_CNT_PER_ONE_SCROLL * scrollCnt);
+                }
+            }
+
 
             return imageView;
         }
 
     }
-
-    class ImageDecodingTask extends AsyncTask<byte[], Void, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(byte[]... byteArrays) {
-
-            Bitmap bitmapTo = null;
-            try {
-                for (int i = 0; i < byteArrays.length; i++) {
-                    long startTime = System.currentTimeMillis();
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(byteArrays[i], 0, byteArrays[i].length, options);
-                    long endTime = System.currentTimeMillis();
-                    Log.d("meme", "spendingTime Thread 1 => " + (endTime - startTime));
-//                    questionImgArr.add(i,bitmap);
-                    bitmapTo = bitmap;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return bitmapTo;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-
-            super.onPostExecute(result);
-//            ImageAdapter imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
-            questionImgArr.add(result);
-            ImageAdapter imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
-            grMain.setAdapter(imgAdp);
-
-        }
-    }
-
 
 }

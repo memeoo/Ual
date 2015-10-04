@@ -39,10 +39,10 @@
         </activity>
 
         <activity android:name=".activities.InputNickNameActivity"></activity>
-        <activity android:name=".activities.BoardActivity"></activity>
+        <activity android:name=".activities.BoardActivity" android:windowSoftInputMode="adjustPan"></activity>
         <activity android:name=".activities.InputTagActivity"></activity>
         <activity android:name=".activities.QuestionActivity"></activity>
-        <activity android:name=".activities.DetailEachActivity"></activity>
+        <activity android:name=".activities.DetailEachActivity" android:windowSoftInputMode="adjustResize"></activity>
 
 
         <service android:name="com.parse.PushService" />

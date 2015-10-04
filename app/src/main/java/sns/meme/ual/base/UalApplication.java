@@ -82,6 +82,8 @@ public class UalApplication extends Application {
         progressDialog.setProgressStyle(ProgressDialog.THEME_DEVICE_DEFAULT_LIGHT);
         progressDialog.setMessage(message);
         progressDialog.setCancelable(false);
+        progressDialog.setCancelable(true);
+        progressDialog.setCanceledOnTouchOutside(true);
         progressDialog.show();
     }
 

@@ -3,8 +3,8 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.project.whatthehell.activity.MainActivity"
-    tools:ignore="MergeRootFrame">
+    tools:ignore="MergeRootFrame"
+    tools:context=".activities.DetailEachActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,8 +26,6 @@
                 android:background="@drawable/letter_q_silver"
                 android:layout_height="22.5dp"
                 android:layout_marginLeft="5dp"
-
-
                 android:textSize="16dp" />
 
             <TextView
@@ -52,20 +50,21 @@
             android:id="@+id/imgQuestion"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="60" />
+            android:layout_weight="59" />
 
         <TextView
-            android:layout_width="22.5dp"
-            android:layout_height="22.5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="4"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/letter_a_silver"
+            android:layout_marginTop="2dp"
+            android:text="Answer"
              />
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="22"
+            android:layout_weight="21.5"
             android:layout_marginTop="2dp"
             android:fillViewport="true"
             android:id="@+id/scrollView">
@@ -83,7 +82,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="11.5"
+            android:layout_weight="8.5"
             android:focusable="true"
             android:layout_gravity="bottom"
             android:focusableInTouchMode="true"
@@ -101,8 +100,9 @@
                     android:layout_weight="16"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:text="Answer: "
-                    android:textSize="14dp" />
+                    android:text="Your Answer: "
+                    android:textSize="14dp"
+                     />
 
                 <EditText
                     android:id="@+id/edAnswer"

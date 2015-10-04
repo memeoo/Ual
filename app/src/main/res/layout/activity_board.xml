@@ -4,23 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.project.whatthehell.activity.MainActivity"
-    tools:ignore="MergeRootFrame" >
+
+    tools:ignore="MergeRootFrame">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:focusableInTouchMode="true"
         android:focusable="true"
-        android:weightSum="100"
-        >
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10"
-            android:weightSum="100"
-            android:gravity="center_vertical" >
+            android:layout_weight="6"
+            android:gravity="center_vertical"
+
+            android:weightSum="100">
 
             <EditText
                 android:id="@+id/edSearch"
@@ -28,8 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_weight="95"
-                android:ems="10" >
-            </EditText>
+                android:ems="10"></EditText>
 
             <Button
                 android:id="@+id/btnSearch"
@@ -43,39 +43,40 @@
                 android:id="@+id/btnRefresh"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/agt_reload"
                 android:layout_marginLeft="15dp"
-                android:visibility="gone"
-                android:textSize="8.5sp" />
+                android:background="@drawable/agt_reload"
+                android:textSize="8.5sp"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/btnSetting"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/settings"
                 android:layout_marginLeft="20dp"
+                android:background="@drawable/settings"
                 android:textSize="8.5sp" />
         </LinearLayout>
+
 
         <GridView
             android:id="@+id/glboard"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="82"
+            android:layout_weight="85"
 
-
-            android:horizontalSpacing="5dp"
-            android:numColumns="3"
-
-            android:stretchMode="columnWidth"
             android:gravity="center"
+            android:horizontalSpacing="5dp"
+
+            android:numColumns="3"
+            android:stretchMode="columnWidth"
             android:verticalSpacing="5dp" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="center_vertical"
-            android:layout_weight="8" >
+            android:layout_weight="8"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/textView1"
@@ -84,20 +85,39 @@
                 android:layout_marginLeft="5dp"
                 android:text=" 질문하기 " />
 
-            <Button
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="6"></View>
+
+            <LinearLayout
                 android:id="@+id/btnCamera"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="카메라" />
+                android:gravity="center">
 
-            <Button
+                <Button
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/camera"
+                    android:clickable="false" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/btnGallery"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="갤러리" />
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/gallery"
+                    android:clickable="false" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
