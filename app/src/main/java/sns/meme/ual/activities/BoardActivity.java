@@ -61,6 +61,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     private LinearLayout btnCamera, btnGallery;
     private GridView grMain;
     private ArrayList<Bitmap> questionImgArr;
+    private ArrayList<String> objIdArr;
     boolean isFromGallery;
     private ParseQuery imgFileQuery;
     private static final String TAG = BoardActivity.class.getSimpleName();
@@ -74,9 +75,10 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     private ImageLoader imgLoader;
     private static final int FIRST_SHOW_COUNT = 18;
     private static final int IMG_CNT_PER_ONE_SCROLL = 18;
+    private static final int MAX_CNT_TOSHOW = 120;
 
     private ImageAdapter imgAdp;
-    private int queryCnt;
+    private int currentQuriedCnt, stackedQuriedCnt;
     private int scrollCnt = 1;
 
     interface OnFinishDownload {
@@ -92,13 +94,11 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setView();
         setImageLoader();
         setCommonVarilable();
         meQuery();
         imgFileQuery(0,FIRST_SHOW_COUNT);
-
     }
 
     public void setView() {
@@ -123,6 +123,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         BITMAP_WIDTH = (int) UalApplication.getScreenSizePix(activity)[0] / 3;
         BITMAP_HEIGHT = (int) UalApplication.getScreenSizePix(activity)[1] / 5;
         questionImgArr = new ArrayList<Bitmap>();
+        objIdArr = new ArrayList<String>();
 
     }
 
@@ -164,43 +165,23 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         meQuery.getFirstInBackground(new GetCallback() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
-                Log.d("meme", " getFirstInBackground 11111 ");
 
             }
 
             @Override
             public void done(Object o, Throwable throwable) {
-                Log.d("meme", " getFirstInBackground 22222 ");
                 Common.memberMe = (UalMember) o;
-                Log.d("meme", " BoardActivity Common.memberMe >>>> " + Common.memberMe.getObjectId());
-
-                ParseQuery tagQuery = ParseQuery.getQuery("Tag");
-                tagQuery.whereEqualTo("member", Common.memberMe);
-
-                Log.d("meme", " MemberMe >>>> " + Common.memberMe.getObjectId());
-                tagQuery.getFirstInBackground(new GetCallback() {
-                    @Override
-                    public void done(ParseObject parseObject, ParseException e) {
-
-                    }
-
-                    @Override
-                    public void done(Object o, Throwable throwable) {
-
-                    }
-                });
             }
         });
     }
 
-    public boolean isLast(int limitCnt){
-        boolean isLast = false;
-
-        if(limitCnt > queryCnt ){
-            isLast = true;
+    public boolean hasMoreQuestions(int compareCnt){
+        boolean hasMore = false;
+        Log.d("meme", " currentQuriedCnt => " + currentQuriedCnt + " compareCnt => " + compareCnt);
+        if(compareCnt >= currentQuriedCnt){
+            hasMore = true;
         }
-
-        return isLast;
+        return hasMore;
     }
 
     public void imgFileQuery(int skipCnt, int limitCnt) {
@@ -209,10 +190,12 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
 
 //        try {
-//            queryCnt = imgFileQuery.count();
+//            currentQuriedCnt = imgFileQuery.count();
 //        } catch (ParseException e) {
 //            e.printStackTrace();
 //        }
+        Log.d("meme", " skipCnt = " + skipCnt);
+        Log.d("meme", " limitCnt = " + limitCnt);
 
         imgFileQuery.setSkip(skipCnt);
         imgFileQuery.setLimit(limitCnt);
@@ -227,17 +210,20 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 Log.d("meme", " time fast => " + (endTime - startTime) / 100.0f + "");
 
                 if (e == null) {
-                    queryCnt = parseObjects.size();
+                    currentQuriedCnt = parseObjects.size();
                     final Handler handler = new Handler() {
                         @Override
                         public void handleMessage(Message msg) {
                             if (msg.what == 1) {
+                                Log.d("meme", " what == 1");
                                 imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
                                 grMain.setAdapter(imgAdp);
-                                UalApplication.closeProgressDialog();
+
                             } else if (msg.what == 2) {
+                                Log.d("meme", " what == 2");
                                 imgAdp.notifyDataSetChanged();
                             }
+                            UalApplication.closeProgressDialog();
                         }
                     };
 
@@ -250,17 +236,32 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                                     final ParseFile pf = (ParseFile) po.get("questionImg");
                                     Log.d("meme", " Image URL => " + pf.getUrl());
 
+                                    Log.d("meme", " questionImgArr.size() before = " + questionImgArr.size());
                                     questionImgArr.add(imgLoader.loadImageSync(pf.getUrl()));
-                                    if (questionImgArr.size() == Math.floor(FIRST_SHOW_COUNT / 2)) {    //절반값에 도달하면
+                                    objIdArr.add(po.getObjectId());
+                                    Log.d("meme", " questionImgArr.size() after = " + questionImgArr.size());
+                                    Log.d("meme", " parseObjects.size() = " + parseObjects.size());
+
+
+
+                                    Log.d("meme", " handler 0 scrollCnt = " + FIRST_SHOW_COUNT * scrollCnt);
+
+                                    if (questionImgArr.size() == Math.floor(FIRST_SHOW_COUNT * scrollCnt / 2)) {    //절반값에 도달하면
+                                        Log.d("meme", " handler 1 scrollCnt = " + scrollCnt);
                                         handler.sendEmptyMessage(1); // adapter set 한다.
-                                    } else if (questionImgArr.size() == FIRST_SHOW_COUNT || questionImgArr.size() == parseObjects.size()) {
-                                        handler.sendEmptyMessage(2); // adapter notifyDataSetChange 한다.
                                     }
+//
 
                                 } catch (Exception e1) {
                                     e1.printStackTrace();
                                     Log.d("meme", "Exception => " + e1.toString());
                                 }
+                            }
+                            stackedQuriedCnt = stackedQuriedCnt + parseObjects.size();
+                            Log.d("meme", "stackedQuriedCnt = " + stackedQuriedCnt);
+                            if( questionImgArr.size() == stackedQuriedCnt){
+                                Log.d("meme", " handler 2 scrollCnt = " + scrollCnt);
+                                handler.sendEmptyMessage(2); // adapter notifyDataSetChange 한다.
                             }
                         }
                     }).start();
@@ -269,14 +270,15 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             Intent intent = new Intent(getBaseContext(), DetailEachActivity.class);
-                            String questionObjId = parseObjects.get(position).getObjectId();
+                            String questionObjId = objIdArr.get(position);
                             intent.putExtra("questionObjId", questionObjId);
                             startActivity(intent);
                         }
                     });
 
                 } else {
-
+                    Log.d("meme", " exception e => " +e.toString());
+                    UalApplication.closeProgressDialog();
                 }
 
             }
@@ -496,6 +498,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         private Context mContext;
         private ArrayList<Bitmap> mThumbIds;
         private float[] screenSize;
+        boolean isOnceCalled = false;
 
         public ImageAdapter(Context c, ArrayList<Bitmap> bitmapList) {
             mContext = c;
@@ -530,16 +533,30 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 imageView = (ImageView) convertView;
             }
 
-            if (position < mThumbIds.size()) {
-                imageView.setImageBitmap(mThumbIds.get(position));
+            Log.d("meme", " position = " + position + " mThumbIds " + mThumbIds.size());
+
+
+
+            Log.d("meme", " position = " + position + " FIRST_SHOW_COUNT * scrollCnt " + FIRST_SHOW_COUNT * scrollCnt);
+            if (position == FIRST_SHOW_COUNT * scrollCnt -1) {     // 위치가 끝에 이르면
+                Log.d("meme", " position !! => " + position + " scrollCnt => " + scrollCnt + " FIRST_SHOW_COUNT * scrollCnt => " + FIRST_SHOW_COUNT * scrollCnt);
+                scrollCnt++;
+                isOnceCalled = true;
+                Log.d("meme", " position !! => " + position + " scrollCnt => " + scrollCnt);
+                int newQuerylimit = FIRST_SHOW_COUNT * scrollCnt;
+
+                imgFileQuery(currentQuriedCnt, newQuerylimit);
+
+
             }
 
-            if (position >= queryCnt-2) {
-                scrollCnt++;
-                Log.d("meme", " position !! => " + position + " scrollCnt => " + scrollCnt);
-                if(!isLast(FIRST_SHOW_COUNT)) {
-                    imgFileQuery(queryCnt, IMG_CNT_PER_ONE_SCROLL * scrollCnt);
-                }
+//            else if(position < FIRST_SHOW_COUNT * scrollCnt && isOnceCalled){
+//                Log.d("meme", " else if !!");
+//                scrollCnt--;
+//            }
+
+            if (position < mThumbIds.size()) {
+                imageView.setImageBitmap(mThumbIds.get(position));
             }
 
 
