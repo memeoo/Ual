@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +37,7 @@ import sns.meme.ual.model.UalMember;
 
 public class DetailEachActivity extends Activity {
 
-    private TextView tvQuestion, tvQuestionedAt;
+    private TextView tvQuestion, tvQuestionedAt, tvFixedAnswer;
     private EditText edAnswer;
     private Button btnAnswer;
 
@@ -46,6 +47,8 @@ public class DetailEachActivity extends Activity {
     private ParseFile pf;
     private ImageView imgPhoto;
     private LinearLayout llAddAnswer;
+
+    private ScrollView scrollView;
 
     private String qObjId;
 
@@ -65,8 +68,12 @@ public class DetailEachActivity extends Activity {
         edAnswer = (EditText)findViewById(R.id.edAnswer);
         edAnswer.setHint("Wating your answer ...");
 
+        scrollView = (ScrollView)findViewById(R.id.scrollView);
+        tvFixedAnswer = (TextView)findViewById(R.id.tvFixedAnswer);
 
         qObjId = getIntent().getStringExtra("questionObjId");
+
+        UalApplication.showProgressDialog(this, "Loading...");
         ParseQuery questionQry = ParseQuery.getQuery("Question");
         questionQry.whereEqualTo("objectId", qObjId);
         questionQry.getFirstInBackground(new GetCallback() {
@@ -79,31 +86,30 @@ public class DetailEachActivity extends Activity {
             @Override
             public void done(Object o, Throwable throwable) {
                 Log.d("meme", " @@@ ======= ");
-                ParseObject parseObject = (ParseObject)o;
+                ParseObject parseObject = (ParseObject) o;
                 question = parseObject.getString("Question");
                 pf = parseObject.getParseFile("questionImg");
 
                 pf.getDataInBackground(new GetDataCallback() {
                     @Override
                     public void done(byte[] bytes, ParseException e) {
-                        if(e == null) {
+                        if (e == null) {
                             final BitmapFactory.Options options = new BitmapFactory.Options();
                             options.inSampleSize = 4;
                             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
                             imgPhoto.setImageBitmap(bitmap);
-//                            if(bitmap != null){
-//                                bitmap.recycle();
-//                            }
+                            UalApplication.closeProgressDialog();
                         }
                     }
                 });
 
 
-
                 questionedAt = parseObject.getUpdatedAt();
                 tvQuestion.setText(question);
 //                SimpleDateFormat transFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm");
-                tvQuestionedAt.setText(Common.getStrDateFromDate(questionedAt));
+                String questionDate = Common.getStrDateFromDate(questionedAt).trim().substring(0, 8);
+                String questionTime = Common.getStrDateFromDate(questionedAt).trim().substring(9);
+                tvQuestionedAt.setText(questionDate + "일 " + questionTime + "분");
                 getAnswerFromParse();
             }
         });
@@ -111,9 +117,28 @@ public class DetailEachActivity extends Activity {
         btnAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendAnswerToParse();
+                if (edAnswer.getTextSize() < 3) {
+                    Toast.makeText(DetailEachActivity.this, "답변이 너무 짧아요!!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!edAnswer.getText().toString().equals(""))
+                    sendAnswerToParse();
+
             }
         });
+
+        edAnswer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                    if(b){
+                        Log.d("meme", " Up !!!!!");
+                    }else{
+                        Log.d("meme", " Down !!!!!");
+                    }
+            }
+        });
+
 	}
 
     public void getAnswerFromParse(){
@@ -205,6 +230,4 @@ public class DetailEachActivity extends Activity {
             }
         });
     }
-
-
 }

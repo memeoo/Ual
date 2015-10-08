@@ -132,6 +132,11 @@ public class InputTagActivity extends Activity {
 
             @Override
             public void onClick(View v) {
+
+                if(edInputTag.getText().toString().equals("")){
+                    return;
+                }
+
                 TextView addedTV = new TextView(InputTagActivity.this);
                 addedTV.setLayoutParams(new LinearLayout.LayoutParams(
                         LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
@@ -157,6 +162,11 @@ public class InputTagActivity extends Activity {
 
             @Override
             public void onClick(View v) {
+
+                if(tagArr.size() == 0){
+                    Toast.makeText(InputTagActivity.this, "등록할 Tag가 없습니다. 먼저 Tag를 입력해 주세요.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 String tagStr = "";
                 for (int i = 0; i < tagArr.size(); i++) {

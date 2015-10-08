@@ -3,6 +3,7 @@ package sns.meme.ual.activities;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -22,6 +24,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -80,6 +83,8 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     private ImageAdapter imgAdp;
     private int currentQuriedCnt, stackedQuriedCnt;
     private int scrollCnt = 1;
+    private String searchKeyword="";
+    private int activityIndex;
 
     interface OnFinishDownload {
         void onFinish();
@@ -104,8 +109,10 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     public void setView() {
         activity = BoardActivity.this;
         setContentView(R.layout.activity_board);
+        activityIndex = 0; // onBackPressed 에서 활용: 백버튼 눌렀을떼 종료 처리 하기 위해
 
         edSearch = (EditText) findViewById(R.id.edSearch);
+        edSearch.setHint("검색어로 찾아 보세요");
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btnRefresh = (Button) findViewById(R.id.btnRefresh);
         btnCamera = (LinearLayout) findViewById(R.id.btnCamera);
@@ -117,6 +124,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         btnCamera.setOnClickListener(this);
         btnGallery.setOnClickListener(this);
         btnSetting.setOnClickListener(this);
+        edSearch.setOnClickListener(this);
 
         grMain = (GridView) findViewById(R.id.glboard);
 
@@ -188,6 +196,11 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         imgFileQuery = ParseQuery.getQuery("Question");
         imgFileQuery.orderByDescending("createdAt");
 
+        if(!searchKeyword.equals("")) {
+            Log.d("meme", "searchKeyword => " + searchKeyword);
+            imgFileQuery.whereContains("QuestionTag", searchKeyword);
+            searchKeyword="";
+        }
 
 //        try {
 //            currentQuriedCnt = imgFileQuery.count();
@@ -291,9 +304,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         String url = "";
 
         switch (v.getId()) {
-            case R.id.btnSearch:
 
-                break;
             case R.id.btnRefresh:
                 Log.d("meme", "Sending push .... ");
                 ParsePush push = new ParsePush();
@@ -356,8 +367,53 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                 startActivity(intent);
 
                 break;
+
+            case R.id.btnSearch:
+                searchKeyword = edSearch.getText().toString();
+                if(searchKeyword.equals("") || searchKeyword == null){
+                    Toast.makeText(this, "검색어를 입력하세요", Toast.LENGTH_SHORT).show();
+                }else{
+                    setDataClear();
+
+                    InputMethodManager mInputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mInputMethodManager.hideSoftInputFromWindow(edSearch.getWindowToken(), 0);
+
+                    imgFileQuery(0, FIRST_SHOW_COUNT);
+                    activityIndex = 1;
+                    edSearch.setText("");
+
+                }
+                break;
             default:
                 break;
+        }
+
+    }
+
+    public void setDataClear(){
+        stackedQuriedCnt = 0;
+        questionImgArr.clear();
+        objIdArr.clear();
+    }
+    @Override
+    public void onBackPressed() {
+        if(activityIndex == 1){
+            searchKeyword="";
+            setDataClear();
+            activityIndex = 0;
+            imgFileQuery(0, FIRST_SHOW_COUNT);
+        }else if(activityIndex == 0){
+            UalApplication.showYesNoDialog(this, "정말 끝내시게?", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                   finish();
+                }
+            }, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    UalApplication.dialog.dismiss();
+                }
+            });
         }
 
     }

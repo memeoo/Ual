@@ -1,9 +1,11 @@
 package sns.meme.ual.base;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.util.DisplayMetrics;
@@ -35,6 +37,7 @@ public class UalApplication extends Application {
     final static private String APP_KEY = "ldiwgq2of5c6p7p";
     final static private String APP_SECRET = "bl0yov8myn9hnmn";
     public static ProgressDialog progressDialog;
+    public static AlertDialog dialog;
     public static ParseInstallation currentInstallation;
 
     @Override
@@ -87,6 +90,16 @@ public class UalApplication extends Application {
         progressDialog.show();
     }
 
+    public static void showYesNoDialog(Context context, String message, DialogInterface.OnClickListener yesClick, DialogInterface.OnClickListener noClick){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(message);
+        builder.setCancelable(true);
+        builder.setPositiveButton("얍~!", yesClick);
+        builder.setNegativeButton("노노~!", noClick);
+
+        dialog = builder.create();
+        dialog.show();
+    }
 
     public static void closeProgressDialog() {
         progressDialog.dismiss();

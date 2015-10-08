@@ -132,6 +132,10 @@ public class QuestionActivity extends UalActivity {
 
             @Override
             public void onClick(View v) {
+                if(edTag.getText().toString().equals("")){
+                    return;
+                }
+
                 TextView addedTV = new TextView(QuestionActivity.this);
                 addedTV.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
                 addedTV.setTextSize(15);
@@ -156,6 +160,11 @@ public class QuestionActivity extends UalActivity {
 
             @Override
             public void onClick(View v) {
+
+                if(edQuestion.getText().toString().equals("")){
+                    return;
+                }
+
                 UalApplication.showProgressDialog(QuestionActivity.this, "Wating...");
                 try {
                     String tagStr = "";
