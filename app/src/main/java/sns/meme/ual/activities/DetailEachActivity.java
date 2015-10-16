@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,6 +30,8 @@ import com.parse.SaveCallback;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import sns.meme.ual.R;
 import sns.meme.ual.base.Common;
@@ -38,7 +41,7 @@ import sns.meme.ual.model.UalMember;
 public class DetailEachActivity extends Activity {
 
     private TextView tvQuestion, tvQuestionedAt, tvFixedAnswer;
-    private EditText edAnswer;
+    private EditText edAnswer, edInputAnswer;
     private Button btnAnswer;
 
     private String question;
@@ -46,7 +49,7 @@ public class DetailEachActivity extends Activity {
 
     private ParseFile pf;
     private ImageView imgPhoto;
-    private LinearLayout llAddAnswer;
+    private LinearLayout llAddAnswer, inputAnswerLL, inputAnswerTempLL;
 
     private ScrollView scrollView;
 
@@ -64,9 +67,14 @@ public class DetailEachActivity extends Activity {
         tvQuestionedAt = (TextView)findViewById(R.id.tvQuestionedAt);
         imgPhoto = (ImageView)findViewById(R.id.imgQuestion);
         llAddAnswer = (LinearLayout)findViewById(R.id.llAddAnswer);
+        inputAnswerLL = (LinearLayout)findViewById(R.id.inputAnswerLL);
+        inputAnswerTempLL = (LinearLayout)findViewById(R.id.inputAnswerTempLL);
         btnAnswer = (Button)findViewById(R.id.btnAnswer);
         edAnswer = (EditText)findViewById(R.id.edAnswer);
         edAnswer.setHint("Wating your answer ...");
+        edAnswer.setInputType(0);
+
+        edInputAnswer = (EditText)findViewById(R.id.edInputAnswer);
 
         scrollView = (ScrollView)findViewById(R.id.scrollView);
         tvFixedAnswer = (TextView)findViewById(R.id.tvFixedAnswer);
@@ -114,30 +122,51 @@ public class DetailEachActivity extends Activity {
             }
         });
 
-        btnAnswer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (edAnswer.getTextSize() < 3) {
-                    Toast.makeText(DetailEachActivity.this, "답변이 너무 짧아요!!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (!edAnswer.getText().toString().equals(""))
-                    sendAnswerToParse();
-
-            }
-        });
-
         edAnswer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                    if(b){
-                        Log.d("meme", " Up !!!!!");
-                    }else{
-                        Log.d("meme", " Down !!!!!");
-                    }
+                if(b){
+                    inputAnswerLL.setVisibility(View.VISIBLE);
+                    inputAnswerTempLL.setVisibility(View.GONE);
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(DetailEachActivity.INPUT_METHOD_SERVICE);
+                    mgr.showSoftInput(edInputAnswer, InputMethodManager.SHOW_IMPLICIT);
+                }
             }
         });
+
+//        edAnswer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                inputAnswerLL.setVisibility(View.VISIBLE);
+//                inputAnswerTempLL.setVisibility(View.GONE);
+//            }
+//        });
+
+        btnAnswer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String answer = edInputAnswer.getText().toString();
+                if (answer.length() < 3) {
+                    Toast.makeText(DetailEachActivity.this, "답변이 너무 짧아요!!", Toast.LENGTH_SHORT).show();
+                    return;
+                }else{
+                    sendAnswerToParse();
+                }
+
+
+            }
+        });
+//
+//        edAnswer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View view, boolean b) {
+//                    if(b){
+//                        Log.d("meme", " Up !!!!!");
+//                    }else{
+//                        Log.d("meme", " Down !!!!!");
+//                    }
+//            }
+//        });
 
 	}
 
@@ -165,10 +194,10 @@ public class DetailEachActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT));
         addedAnswer.setTextSize(15);
         addedAnswer.setPadding(20, 0, 15, 0);
-        addedAnswer.setText(Common.nickName + ": "+ edAnswer.getText() +"    " + Common.getStrNow());
+        addedAnswer.setText(Common.nickName + ": "+ edInputAnswer.getText() +"    " + Common.getStrNow());
         llAddAnswer.addView(addedAnswer);
 
-        edAnswer.setText("");
+        edInputAnswer.setText("");
     }
 
     public void addAnswerResult(List<ParseObject> list){
@@ -209,13 +238,13 @@ public class DetailEachActivity extends Activity {
             llAddAnswer.addView(addedRow);
         }
 
-        edAnswer.setText("");
+        edInputAnswer.setText("");
     }
 
     public void sendAnswerToParse(){
         UalApplication.showProgressDialog(DetailEachActivity.this, "Uploading...");
         ParseObject answerObj = new ParseObject("Answer");
-        answerObj.put("answer", edAnswer.getText().toString());
+        answerObj.put("answer", edInputAnswer.getText().toString());
         answerObj.put("answerer", Common.memberMe);
         answerObj.put("questionObjId", qObjId);
         answerObj.saveInBackground(new SaveCallback() {
@@ -224,9 +253,23 @@ public class DetailEachActivity extends Activity {
                 UalApplication.closeProgressDialog();
                 if(e==null){
                     addAnswerResult();
+
                 }else{
                     Toast.makeText(DetailEachActivity.this," Network나 통신 환경에 문제가 있습니다. " + e.toString() , Toast.LENGTH_SHORT).show();
                 }
+
+                Timer timer =new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        InputMethodManager mgr = (InputMethodManager) getSystemService(DetailEachActivity.INPUT_METHOD_SERVICE);
+                        mgr.showSoftInput(edInputAnswer, 0);
+                    }
+                }, 50);
+
+                inputAnswerLL.setVisibility(View.GONE);
+                inputAnswerTempLL.setVisibility(View.VISIBLE);
+
             }
         });
     }

@@ -81,7 +81,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
     private static final int MAX_CNT_TOSHOW = 120;
 
     private ImageAdapter imgAdp;
-    private int currentQuriedCnt, stackedQuriedCnt;
+    private int currentQuriedCnt, stackedQuriedCnt, statckedImgCnt;
     private int scrollCnt = 1;
     private String searchKeyword="";
     private int activityIndex;
@@ -155,7 +155,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
                 .memoryCache(new LruMemoryCache(memClass * 1024 * 1024 / 8))
                 .memoryCacheSize(4 * 1024 * 1024)
-                .diskCacheSize(50 * 1024 * 1024)
+                .diskCacheSize(100 * 1024 * 1024)
                 .defaultDisplayImageOptions(options)
                 .build();
 
@@ -229,8 +229,11 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                         public void handleMessage(Message msg) {
                             if (msg.what == 1) {
                                 Log.d("meme", " what == 1");
+//                                ArrayList<Bitmap> bitmapList = (ArrayList<Bitmap>)msg.obj;
                                 imgAdp = new ImageAdapter(getBaseContext(), questionImgArr);
+
                                 grMain.setAdapter(imgAdp);
+
 
                             } else if (msg.what == 2) {
                                 Log.d("meme", " what == 2");
@@ -243,14 +246,15 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+//                            ArrayList<Bitmap> questionImgArr = new ArrayList<Bitmap>();
                             for (ParseObject po : parseObjects) {
-
                                 try {
                                     final ParseFile pf = (ParseFile) po.get("questionImg");
                                     Log.d("meme", " Image URL => " + pf.getUrl());
 
-                                    Log.d("meme", " questionImgArr.size() before = " + questionImgArr.size());
-                                    questionImgArr.add(imgLoader.loadImageSync(pf.getUrl()));
+//                                    Log.d("meme", " questionImgArr.size() before = " + questionImgArr.size());
+                                    Bitmap eachBitmap = imgLoader.loadImageSync(pf.getUrl());
+                                    questionImgArr.add(eachBitmap);
                                     objIdArr.add(po.getObjectId());
                                     Log.d("meme", " questionImgArr.size() after = " + questionImgArr.size());
                                     Log.d("meme", " parseObjects.size() = " + parseObjects.size());
@@ -262,6 +266,12 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                                     if (questionImgArr.size() == Math.floor(FIRST_SHOW_COUNT * scrollCnt / 2)) {    //절반값에 도달하면
                                         Log.d("meme", " handler 1 scrollCnt = " + scrollCnt);
                                         handler.sendEmptyMessage(1); // adapter set 한다.
+
+//                                        Message msg = Message.obtain();
+//                                        msg.obj = questionImgArr;
+//                                        msg.what = 1;
+//                                        handler.sendMessage(msg);
+
                                     }
 //
 
@@ -271,6 +281,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
                                 }
                             }
                             stackedQuriedCnt = stackedQuriedCnt + parseObjects.size();
+
                             Log.d("meme", "stackedQuriedCnt = " + stackedQuriedCnt);
                             if( questionImgArr.size() == stackedQuriedCnt){
                                 Log.d("meme", " handler 2 scrollCnt = " + scrollCnt);
@@ -392,7 +403,7 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
 
     public void setDataClear(){
         stackedQuriedCnt = 0;
-        questionImgArr.clear();
+//        questionImgArr.clear();
         objIdArr.clear();
     }
     @Override
@@ -416,6 +427,12 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
             });
         }
 
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
     }
 
     @Override

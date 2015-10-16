@@ -3,45 +3,45 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:ignore="MergeRootFrame"
-    tools:context=".activities.DetailEachActivity">
+    tools:context=".activities.DetailEachActivity"
+    tools:ignore="MergeRootFrame">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="100"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="center_vertical"
             android:layout_weight="7"
-            android:weightSum="100"
-            android:orientation="horizontal">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:weightSum="100">
 
             <TextView
                 android:id="@+id/textView1"
                 android:layout_width="22.5dp"
-                android:background="@drawable/letter_q_silver"
                 android:layout_height="22.5dp"
                 android:layout_marginLeft="5dp"
+                android:background="@drawable/letter_q_silver"
                 android:textSize="16dp" />
 
             <TextView
                 android:id="@+id/tvQuestion"
                 android:layout_width="0dp"
-                android:layout_weight="68"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
+                android:layout_weight="68"
                 android:textSize="15dp" />
 
             <TextView
                 android:id="@+id/tvQuestionedAt"
                 android:layout_width="0dp"
-                android:layout_weight="22"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
+                android:layout_weight="22"
                 android:textSize="9dp" />
         </LinearLayout>
 
@@ -53,28 +53,28 @@
             android:layout_weight="59" />
 
         <TextView
+            android:id="@+id/tvFixedAnswer"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_weight="4"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="2dp"
-            android:text="Answer"
-            android:id="@+id/tvFixedAnswer" />
+            android:layout_weight="4"
+            android:text="Answer" />
 
         <ScrollView
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="21.5"
             android:layout_marginTop="2dp"
-            android:fillViewport="true"
-            android:id="@+id/scrollView">
+            android:layout_weight="21.5"
+            android:fillViewport="true">
 
             <LinearLayout
+                android:id="@+id/llAddAnswer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingBottom="1.5dp"
-                android:id="@+id/llAddAnswer"
-                android:orientation="vertical"></LinearLayout>
+                android:orientation="vertical"
+                android:paddingBottom="1.5dp"></LinearLayout>
 
         </ScrollView>
 
@@ -82,47 +82,81 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_gravity="bottom"
             android:layout_weight="7.5"
             android:focusable="true"
-            android:layout_gravity="bottom"
+            android:id="@+id/inputAnswerTempLL"
             android:focusableInTouchMode="true"
             android:orientation="vertical">
+
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="bottom"
-                android:weightSum="100"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:weightSum="100">
 
                 <TextView
                     android:layout_width="0dp"
-                    android:layout_weight="17"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
+                    android:layout_weight="17"
                     android:text="Your Answer: "
-                    android:textSize="14dp"
-                     />
+                    android:textSize="14dp" />
 
                 <EditText
                     android:id="@+id/edAnswer"
                     android:layout_width="0dp"
-                    android:layout_weight="67"
-                    android:textSize="12dp"
                     android:layout_height="match_parent"
-                    android:ems="10"></EditText>
+                    android:layout_weight="84"
+                    android:ems="10"
+                    android:textSize="12dp"></EditText>
 
-                <Button
-                    android:id="@+id/btnAnswer"
-                    android:layout_width="0dp"
-                    android:layout_weight="17"
-                    android:layout_height="wrap_content"
-                    android:onClick="onClickAnswer"
-                    android:textSize="11dp"
-                    android:text="SEND"></Button>
+                <!--<Button-->
+                    <!--android:id="@+id/btnAnswer"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="17"-->
+                    <!--android:onClick="onClickAnswer"-->
+                    <!--android:text="SEND"-->
+                    <!--android:textSize="11dp"></Button>-->
             </LinearLayout>
+
 
         </LinearLayout>
     </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:weightSum="100"
+        android:orientation="horizontal"
+        android:layout_marginLeft="3dp"
+        android:layout_gravity="bottom"
+        android:id="@+id/inputAnswerLL"
+        android:visibility="gone"
+        android:layout_marginRight="3dp">
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="80"
+            android:layout_height="match_parent"
+            android:hint=" Wating your Answer "
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:id="@+id/edInputAnswer"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="20"
+            android:layout_height="50dp"
+            android:text="SEND"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/btnAnswer"
+            />
+    </LinearLayout>
+
 
 </FrameLayout>
