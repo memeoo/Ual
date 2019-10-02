@@ -192,6 +192,10 @@ public class BoardActivity extends UalActivity implements View.OnClickListener {
         return hasMore;
     }
 
+    public void TestGit(){
+        Log.d("meme", "Test Git!!");
+    }
+
     public void imgFileQuery(int skipCnt, int limitCnt) {
         imgFileQuery = ParseQuery.getQuery("Question");
         imgFileQuery.orderByDescending("createdAt");
